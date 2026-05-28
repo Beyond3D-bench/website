@@ -14,7 +14,7 @@ const projectMembers: TeamPerson[] = [
     affiliation: "MSc Data Science, ETH Zürich",
     role: "Project member",
     focus:
-      "Out-of-sight spatial memory benchmark, question generation, question design prompt engineering, 3D-VLM evaluation, edge-case handling, setup, integration into a single package, and research.",
+      "Out-of-sight spatial memory benchmark, question generation, question design, prompt engineering, 3D-VLM evaluation, edge-case handling, setup, integration into a single package, and research.",
   },
   {
     name: "Ivo Alexander Ban",
