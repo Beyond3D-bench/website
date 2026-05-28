@@ -472,14 +472,14 @@ function VideoPane({
       <div
         title={`HD-EPIC: A Highly-Detailed Egocentric Video Dataset by Toby Perrett et al.
 
-    Dataset: https://hd-epic.github.io/site/
-    Paper: https://arxiv.org/abs/2502.04144
-    DOI: https://doi.org/10.48550/arXiv.2502.04144
+Dataset: https://hd-epic.github.io/site/
+Paper: https://arxiv.org/abs/2502.04144
+DOI: https://doi.org/10.48550/arXiv.2502.04144
 
-    Licensed under CC BY-NC 4.0: https://creativecommons.org/licenses/by-nc/4.0/.
+Licensed under CC BY-NC 4.0: https://creativecommons.org/licenses/by-nc/4.0/.
 
-    Changes to full fps: No changes were made.
-    Changes to 1 fps PS · sampled: the video was resized, frame samples were extracted, and a timestamp watermark was added.
+Changes to full fps: No changes were made.
+Changes to 1 fps PS · sampled: the video was resized, frame samples were extracted, and a timestamp watermark was added.
     `}
         className="pointer-events-auto absolute inset-0 z-10 bg-white/10 dark:bg-transparent"
       />
