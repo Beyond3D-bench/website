@@ -1,0 +1,14 @@
+{
+  "userId": "P04",
+  "videoId": "P04-20240415-184003",
+  "source": "framewise_info.jsonl",
+  "maxPartBytes": 20971520,
+  "totalLines": 31130,
+  "parts": [
+    {
+      "file": "part-000.jsonl",
+      "bytes": 16343326,
+      "lines": 31130
+    }
+  ]
+}

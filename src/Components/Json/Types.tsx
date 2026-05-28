@@ -20,8 +20,9 @@ export interface Step {
   question_class: string;
   question: string | string[];
   choices: string[];
-  correct_idx: number | null;
+  correct_idx?: number | null;
   acceptable_idxs?: number[];
+  acceptable_answers?: string[];
   answer_metadata: AnswerMetadata;
   skipped?: boolean;
 }

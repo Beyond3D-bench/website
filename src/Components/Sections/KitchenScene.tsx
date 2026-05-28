@@ -433,39 +433,89 @@ function FixtureObjectEdges({
 }
 
 function HoveredObjectEdges({ object }: { object: THREE.Object3D | null }) {
-  const helperRef = useRef<THREE.Box3Helper | null>(null);
-  const boxRef = useRef(new THREE.Box3());
+  const [edges, setEdges] = useState<THREE.LineSegments[]>([]);
 
-  useFrame(() => {
-    const helper = helperRef.current;
-
-    if (!helper) return;
+  useEffect(() => {
+    edges.forEach((edge) => {
+      edge.geometry.dispose();
+      if (Array.isArray(edge.material)) {
+        edge.material.forEach((m) => m.dispose());
+      } else {
+        edge.material.dispose();
+      }
+    });
 
     if (!object) {
-      helper.visible = false;
+      setEdges([]);
       return;
     }
+
+    const nextEdges: THREE.LineSegments[] = [];
 
     object.updateWorldMatrix(true, true);
 
-    const box = boxRef.current.setFromObject(object);
+    object.traverse((child) => {
+      const mesh = child as THREE.Mesh;
 
-    if (box.isEmpty()) {
-      helper.visible = false;
-      return;
-    }
+      if (!mesh.isMesh || !mesh.geometry) return;
 
-    helper.box.copy(box);
-    helper.visible = true;
-    helper.updateMatrixWorld(true);
+      const geometry = new THREE.EdgesGeometry(mesh.geometry, 20);
+      const material = new THREE.LineBasicMaterial({
+        color: "#67e8f9",
+        depthTest: false,
+      });
+
+      const line = new THREE.LineSegments(geometry, material);
+
+      line.matrix.copy(mesh.matrixWorld);
+      line.matrixAutoUpdate = false;
+      line.renderOrder = 1000;
+
+      nextEdges.push(line);
+    });
+
+    setEdges(nextEdges);
+
+    return () => {
+      nextEdges.forEach((edge) => {
+        edge.geometry.dispose();
+        if (Array.isArray(edge.material)) {
+          edge.material.forEach((m) => m.dispose());
+        } else {
+          edge.material.dispose();
+        }
+      });
+    };
+  }, [object]);
+
+  useFrame(() => {
+    if (!object) return;
+
+    let i = 0;
+
+    object.updateWorldMatrix(true, true);
+
+    object.traverse((child) => {
+      const mesh = child as THREE.Mesh;
+
+      if (!mesh.isMesh) return;
+
+      const line = edges[i];
+      if (!line) return;
+
+      line.matrix.copy(mesh.matrixWorld);
+      line.updateMatrixWorld(true);
+
+      i += 1;
+    });
   });
 
   return (
-    <primitive
-      ref={helperRef}
-      object={new THREE.Box3Helper(boxRef.current, new THREE.Color("#67e8f9"))}
-      renderOrder={100}
-    />
+    <>
+      {edges.map((edge) => (
+        <primitive key={edge.uuid} object={edge} />
+      ))}
+    </>
   );
 }
 
