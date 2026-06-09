@@ -572,11 +572,7 @@ export default function QuestionView() {
       {/* LEFT: video selector / 3D scene */}
       <aside
         style={{ width: `${leftWidth}%` }}
-        className={`flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[box-shadow,background-color] duration-150 dark:bg-slate-950/80 ${
-          resizingSide === "left"
-            ? "shadow-[inset_-3px_0_0_rgba(37,99,235,0.75)] bg-blue-50/40 dark:bg-blue-950/20"
-            : ""
-        }`}
+        className="flex min-h-0 shrink-0 flex-col overflow-hidden bg-white dark:bg-slate-950/80"
       >
         {/* Left tabs */}
         <div className="flex shrink-0 gap-1 border-b border-slate-200 px-4 dark:border-white/[0.07]">
@@ -663,9 +659,9 @@ export default function QuestionView() {
         role="separator"
         aria-orientation="vertical"
         onPointerDown={startResizeLeft}
-        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition ${
+        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition-opacity ${
           resizingSide === "left"
-            ? "bg-blue-500"
+            ? "bg-blue-500 opacity-80"
             : "bg-slate-200 hover:bg-blue-500 dark:bg-white/[0.07] dark:hover:bg-blue-500"
         }`}
       >
@@ -673,7 +669,6 @@ export default function QuestionView() {
       </div>
       {/* MIDDLE: video always visible */}
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
-        {" "}
         {selectedVideo ? (
           <VideoPlayer
             key={selectedVideo.id}
@@ -692,9 +687,9 @@ export default function QuestionView() {
         role="separator"
         aria-orientation="vertical"
         onPointerDown={startResizeRight}
-        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition ${
+        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition-opacity ${
           resizingSide === "right"
-            ? "bg-blue-500"
+            ? "bg-blue-500 opacity-80"
             : "bg-slate-200 hover:bg-blue-500 dark:bg-white/[0.07] dark:hover:bg-blue-500"
         }`}
       >
@@ -702,11 +697,7 @@ export default function QuestionView() {
       </div>
       <aside
         style={{ width: `${rightWidth}%` }}
-        className={`flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[box-shadow,background-color] duration-150 dark:bg-slate-950/80 ${
-          resizingSide === "right"
-            ? "shadow-[inset_3px_0_0_rgba(37,99,235,0.75)] bg-blue-50/40 dark:bg-blue-950/20"
-            : ""
-        }`}
+        className="flex min-h-0 shrink-0 flex-col overflow-hidden bg-white dark:bg-slate-950/80"
       >
         {/* Right tabs */}
         <div className="flex shrink-0 gap-1 border-b border-slate-200 px-4 dark:border-white/[0.07]">
