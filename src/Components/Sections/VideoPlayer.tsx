@@ -255,7 +255,7 @@ function getAnchors(
     ring: string;
   }[] = [];
 
-  const TOL = 3;
+  const TOL = 0.1;
 
   const allSteps: (Step | BranchStep)[] = [
     ...trajectory.incremental_steps,

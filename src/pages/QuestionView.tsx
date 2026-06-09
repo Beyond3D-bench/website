@@ -245,8 +245,19 @@ function TrajectoryDropdown({
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
+
+const PANEL_MIN_PERCENT = 5;
+const PANEL_BALANCE_THRESHOLD_PERCENT = 40;
+const PANEL_MAX_PERCENT = 90;
+const DEFAULT_LEFT_PANEL_PERCENT = 24;
+const DEFAULT_RIGHT_PANEL_PERCENT = 28;
+
 type ActivePanel = "questions" | "json";
 type LeftPanel = "selector" | "3d";
+type PanelWidths = {
+  left: number;
+  right: number;
+};
 
 function getInitialActivePanel(): ActivePanel {
   if (typeof window === "undefined") return "questions";
@@ -262,7 +273,7 @@ function getInitialTrackingEnabled3d(): boolean {
   return localStorage.getItem(STORAGE_KEYS.trackingEnabled3d) === "true";
 }
 
-function getSavedPanelWidth(
+function getSavedPanelPercent(
   key: string,
   fallback: number,
   min: number,
@@ -275,41 +286,113 @@ function getSavedPanelWidth(
 
   const parsed = Number(raw);
   if (!Number.isFinite(parsed)) return fallback;
+  if (parsed > 100) return fallback;
 
   return clamp(parsed, min, max);
+}
+
+function getPanelWidthsForResize(
+  side: "left" | "right",
+  desiredPercent: number,
+  oppositePercent: number,
+): PanelWidths {
+  const activePercent = clamp(
+    desiredPercent,
+    PANEL_MIN_PERCENT,
+    PANEL_MAX_PERCENT,
+  );
+
+  if (activePercent > PANEL_BALANCE_THRESHOLD_PERCENT) {
+    const remainingPercent = (100 - activePercent) / 2;
+
+    return side === "left"
+      ? {
+          left: activePercent,
+          right: remainingPercent,
+        }
+      : {
+          left: remainingPercent,
+          right: activePercent,
+        };
+  }
+
+  const nextOppositePercent = clamp(
+    oppositePercent,
+    PANEL_MIN_PERCENT,
+    100 - activePercent - PANEL_MIN_PERCENT,
+  );
+
+  return side === "left"
+    ? {
+        left: activePercent,
+        right: nextOppositePercent,
+      }
+    : {
+        left: nextOppositePercent,
+        right: activePercent,
+      };
 }
 
 export default function QuestionView() {
   const [initialSelection] = useState(() => getInitialVideoSelection());
   const [tracking, setTracking] = useState<TrackingEntry | null>(null);
+  const layoutRef = useRef<HTMLDivElement | null>(null);
   type ResizeSide = "left" | "right" | null;
   const [resizingSide, setResizingSide] = useState<ResizeSide>(null);
   const [leftPanel, setLeftPanel] = useState<LeftPanel>("selector");
   const [leftWidth, setLeftWidth] = useState(() =>
-    getSavedPanelWidth(STORAGE_KEYS.leftPanelWidth, 360, 260, 620),
+    getSavedPanelPercent(
+      STORAGE_KEYS.leftPanelWidth,
+      DEFAULT_LEFT_PANEL_PERCENT,
+      PANEL_MIN_PERCENT,
+      PANEL_MAX_PERCENT,
+    ),
   );
 
   const [rightWidth, setRightWidth] = useState(() =>
-    getSavedPanelWidth(STORAGE_KEYS.rightPanelWidth, 420, 300, 720),
+    getSavedPanelPercent(
+      STORAGE_KEYS.rightPanelWidth,
+      DEFAULT_RIGHT_PANEL_PERCENT,
+      PANEL_MIN_PERCENT,
+      PANEL_MAX_PERCENT,
+    ),
   );
 
   const startResizeLeft = (event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
 
+    const layoutWidth = layoutRef.current?.getBoundingClientRect().width ?? 0;
+    if (layoutWidth <= 0) return;
+
     setResizingSide("left");
 
     const startX = event.clientX;
     const startWidth = leftWidth;
-    let latestWidth = leftWidth;
+    let latestWidths: PanelWidths = {
+      left: leftWidth,
+      right: rightWidth,
+    };
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      const delta = moveEvent.clientX - startX;
-      latestWidth = clamp(startWidth + delta, 260, 620);
-      setLeftWidth(latestWidth);
+      const deltaPercent = ((moveEvent.clientX - startX) / layoutWidth) * 100;
+      latestWidths = getPanelWidthsForResize(
+        "left",
+        startWidth + deltaPercent,
+        rightWidth,
+      );
+      setLeftWidth(latestWidths.left);
+      setRightWidth(latestWidths.right);
     };
 
     const handlePointerUp = () => {
-      localStorage.setItem(STORAGE_KEYS.leftPanelWidth, String(latestWidth));
+      localStorage.setItem(
+        STORAGE_KEYS.leftPanelWidth,
+        String(latestWidths.left),
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.rightPanelWidth,
+        String(latestWidths.right),
+      );
 
       setResizingSide(null);
 
@@ -329,20 +412,38 @@ export default function QuestionView() {
   const startResizeRight = (event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
 
+    const layoutWidth = layoutRef.current?.getBoundingClientRect().width ?? 0;
+    if (layoutWidth <= 0) return;
+
     setResizingSide("right");
 
     const startX = event.clientX;
     const startWidth = rightWidth;
-    let latestWidth = rightWidth;
+    let latestWidths: PanelWidths = {
+      left: leftWidth,
+      right: rightWidth,
+    };
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      const delta = startX - moveEvent.clientX;
-      latestWidth = clamp(startWidth + delta, 300, 720);
-      setRightWidth(latestWidth);
+      const deltaPercent = ((startX - moveEvent.clientX) / layoutWidth) * 100;
+      latestWidths = getPanelWidthsForResize(
+        "right",
+        startWidth + deltaPercent,
+        leftWidth,
+      );
+      setLeftWidth(latestWidths.left);
+      setRightWidth(latestWidths.right);
     };
 
     const handlePointerUp = () => {
-      localStorage.setItem(STORAGE_KEYS.rightPanelWidth, String(latestWidth));
+      localStorage.setItem(
+        STORAGE_KEYS.leftPanelWidth,
+        String(latestWidths.left),
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.rightPanelWidth,
+        String(latestWidths.right),
+      );
 
       setResizingSide(null);
 
@@ -464,10 +565,13 @@ export default function QuestionView() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-77px)] overflow-hidden bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+    <div
+      ref={layoutRef}
+      className="flex h-[calc(100vh-77px)] overflow-hidden bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-100"
+    >
       {/* LEFT: video selector / 3D scene */}
       <aside
-        style={{ width: leftWidth }}
+        style={{ width: `${leftWidth}%` }}
         className={`flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[box-shadow,background-color] duration-150 dark:bg-slate-950/80 ${
           resizingSide === "left"
             ? "shadow-[inset_-3px_0_0_rgba(37,99,235,0.75)] bg-blue-50/40 dark:bg-blue-950/20"
@@ -568,7 +672,7 @@ export default function QuestionView() {
         <div className="absolute left-1/2 top-0 h-full w-4 -translate-x-1/2" />
       </div>
       {/* MIDDLE: video always visible */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
         {" "}
         {selectedVideo ? (
           <VideoPlayer
@@ -597,7 +701,7 @@ export default function QuestionView() {
         <div className="absolute left-1/2 top-0 h-full w-4 -translate-x-1/2" />
       </div>
       <aside
-        style={{ width: rightWidth }}
+        style={{ width: `${rightWidth}%` }}
         className={`flex min-h-0 shrink-0 flex-col overflow-hidden bg-white transition-[box-shadow,background-color] duration-150 dark:bg-slate-950/80 ${
           resizingSide === "right"
             ? "shadow-[inset_3px_0_0_rgba(37,99,235,0.75)] bg-blue-50/40 dark:bg-blue-950/20"
