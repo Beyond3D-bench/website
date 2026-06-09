@@ -76,6 +76,18 @@ const DEFAULT_CONFIG = {
   border: "border-slate-200 dark:border-slate-500/20",
 };
 
+function formatNormalizedPixel(value: unknown) {
+  if (!Array.isArray(value) || value.length === 0) return null;
+
+  const numbers = value
+    .map((v) => (typeof v === "number" ? v : Number(v)))
+    .filter((v) => Number.isFinite(v));
+
+  if (numbers.length === 0) return null;
+
+  return `[${numbers.map((v) => v.toFixed(3)).join(", ")}]`;
+}
+
 function QuestionText({
   text,
   queryTimeSec,
@@ -136,6 +148,9 @@ function QuestionCard({
   const isStep1 = !isBranch && stepId === "1";
   const isStep2 = !isBranch && stepId === "2";
   const isStep3 = !isBranch && stepId === "3";
+  const normalizedPixel = formatNormalizedPixel(
+    meta.normalized_projected_pixel,
+  );
 
   const timeButtons = (() => {
     if (isStep1) return [];
@@ -165,14 +180,34 @@ function QuestionCard({
 
   const answerSummaryLines: string[] = [];
 
-  if (meta.sampled_last_visible_time_token) {
+  if (isStep2) {
+    const timeToken =
+      meta.sampled_last_visible_time_token ??
+      meta.last_visible_time_token ??
+      meta.reference_time_token;
+
+    if (timeToken) {
+      answerSummaryLines.push(`Last visible: ${timeToken}`);
+    }
+
+    if (normalizedPixel) {
+      answerSummaryLines.push(`Pixel (norm): ${normalizedPixel}`);
+    }
+  } else if (isStep3) {
+    const timeToken =
+      meta.last_placement_time_token ?? meta.reference_time_token;
+
+    if (timeToken) {
+      answerSummaryLines.push(`Last placement: ${timeToken}`);
+    }
+
+    if (normalizedPixel) {
+      answerSummaryLines.push(`Pixel (norm): ${normalizedPixel}`);
+    }
+  } else if (meta.sampled_last_visible_time_token) {
     answerSummaryLines.push(
       `Last visible: ${meta.sampled_last_visible_time_token}`,
     );
-  }
-
-  if (meta.last_placement_time_token) {
-    answerSummaryLines.push(`Stopped at: ${meta.last_placement_time_token}`);
   }
 
   if (meta.correct_fixture) {
@@ -191,12 +226,14 @@ function QuestionCard({
     );
   }
 
-  if (meta.normalized_projected_pixel) {
-    const px = meta.normalized_projected_pixel as number[];
-    answerSummaryLines.push(
-      `Pixel (norm): [${px.map((v) => v.toFixed(3)).join(", ")}]`,
-    );
+  if (!isStep2 && !isStep3 && normalizedPixel) {
+    answerSummaryLines.push(`Pixel (norm): ${normalizedPixel}`);
   }
+
+  const shouldShowAnswerSummary =
+    showAnswer &&
+    answerSummaryLines.length > 0 &&
+    (step.choices.length === 0 || step.correct_idx == null);
 
   return (
     <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm shadow-slate-900/3 dark:border-white/[0.07] dark:bg-slate-900/60 dark:shadow-none">
@@ -273,20 +310,18 @@ function QuestionCard({
           </div>
         )}
 
-        {showAnswer &&
-          step.correct_idx === null &&
-          answerSummaryLines.length > 0 && (
-            <ul className="mt-3 list-disc space-y-1 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 pl-7 dark:border-emerald-500/25 dark:bg-emerald-500/10">
-              {answerSummaryLines.map((line, i) => (
-                <li
-                  key={i}
-                  className="text-[12px] leading-relaxed text-emerald-700 dark:text-emerald-300"
-                >
-                  {line}
-                </li>
-              ))}
-            </ul>
-          )}
+        {shouldShowAnswerSummary && (
+          <ul className="mt-3 list-disc space-y-1 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 pl-7 dark:border-emerald-500/25 dark:bg-emerald-500/10">
+            {answerSummaryLines.map((line, i) => (
+              <li
+                key={i}
+                className="text-[12px] leading-relaxed text-emerald-700 dark:text-emerald-300"
+              >
+                {line}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       {/* Toggle footer */}
       <div className="border-t border-slate-200 px-3.5 py-2 dark:border-white/5">
