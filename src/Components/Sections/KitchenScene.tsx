@@ -3,7 +3,8 @@ import * as THREE from "three";
 import type { AnswerMetadata, TrajectoryData, VideoEntry } from "../Json/Types";
 import type { TrackingEntry, FramewiseInfo, Matrix3x4 } from "../Camera/Types";
 import { OrbitControls, useGLTF, Line, Html } from "@react-three/drei";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 type KitchenSceneProps = {
   video?: VideoEntry | null;
@@ -16,9 +17,32 @@ type KitchenSceneProps = {
   onSeek?: (timeSec: number) => void;
 };
 
+type SceneQuestionKey = "all" | "1" | "2" | "3" | "4" | "5a" | "5b" | "5c";
+
+type SceneQuestionOption = {
+  key: SceneQuestionKey;
+  label: string;
+  stepLabel: string;
+};
+
+type SceneContentProps = KitchenSceneProps & {
+  selectedQuestionKey: SceneQuestionKey;
+};
+
 const VIDEO_FPS = 30;
 const VIEW_FORWARD_LOCAL = new THREE.Vector3(0, -Math.SQRT1_2, Math.SQRT1_2);
 const CAMERA_VIEW_STORAGE_KEY = "kitchenScene.cameraView";
+
+const QUESTION_OPTIONS: SceneQuestionOption[] = [
+  { key: "all", stepLabel: "All", label: "All Highlights" },
+  { key: "1", stepLabel: "1", label: "Visibility" },
+  { key: "2", stepLabel: "2", label: "Last Visible" },
+  { key: "3", stepLabel: "3", label: "Last Placement" },
+  { key: "4", stepLabel: "4", label: "Nearest Fixture" },
+  { key: "5a", stepLabel: "5a", label: "Camera Direction" },
+  { key: "5b", stepLabel: "5b", label: "Object Relation" },
+  { key: "5c", stepLabel: "5c", label: "Distance" },
+];
 
 function matrix3x4ToMatrix4(m: Matrix3x4): THREE.Matrix4 {
   const mat = new THREE.Matrix4();
@@ -666,13 +690,145 @@ function PointHoverLabel({
   );
 }
 
+function getSceneQuestionOptions(
+  trajectory: TrajectoryData | null | undefined,
+) {
+  if (!trajectory) return QUESTION_OPTIONS.slice(0, 5);
+
+  const incrementalSteps = Array.isArray(trajectory.incremental_steps)
+    ? trajectory.incremental_steps
+    : [];
+  const branchSteps = Object.values(trajectory.branch_groups ?? {}).flat();
+  const availableStepKeys = new Set(
+    [...incrementalSteps, ...branchSteps].map((step) => String(step.step)),
+  );
+
+  return QUESTION_OPTIONS.filter(
+    (option) => option.key === "all" || availableStepKeys.has(option.key),
+  );
+}
+
+function SceneQuestionDropdown({
+  value,
+  options,
+  onChange,
+}: {
+  value: SceneQuestionKey;
+  options: SceneQuestionOption[];
+  onChange: (value: SceneQuestionKey) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+
+      if (target && dropdownRef.current?.contains(target)) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const selectedOption =
+    options.find((option) => option.key === value) ?? options[0];
+
+  if (!selectedOption) return null;
+
+  return (
+    <div ref={dropdownRef} className="@container relative z-30 w-full min-w-0">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className={`flex h-9 w-full min-w-0 items-center justify-center overflow-hidden rounded-full border px-0 text-left text-xs font-semibold transition-all @[80px]:justify-between @[80px]:px-3 ${
+          open
+            ? "border-blue-400 bg-white/90 text-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.22)] dark:border-[#3a6abf]/80 dark:bg-[#0f1e3d] dark:text-[#6ab0ff]"
+            : "border-slate-300/40 bg-slate-100/70 text-slate-600 hover:bg-slate-200/80 hover:text-blue-600 dark:border-[#1e2f45]/60 dark:bg-[#0d1520] dark:text-slate-300 dark:hover:bg-[#101a28] dark:hover:text-[#89c2ff]"
+        }`}
+      >
+        <span className="hidden min-w-0 flex-1 items-center gap-2 overflow-hidden @[80px]:flex">
+          <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 px-1.5 text-[10px] font-bold text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
+            {selectedOption.stepLabel}
+          </span>
+
+          <span className="min-w-0 flex-1 truncate">
+            {selectedOption.label}
+          </span>
+        </span>
+
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <div
+        className={`absolute left-0 top-full z-50 mt-2 w-full min-w-52 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-900/15 transition-all dark:border-white/[0.07] dark:bg-slate-950 dark:shadow-black/40 ${
+          open
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-1 opacity-0"
+        }`}
+      >
+        <div className="p-1">
+          {options.map((option) => {
+            const selected = option.key === selectedOption.key;
+
+            return (
+              <button
+                key={option.key}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(option.key);
+                  setOpen(false);
+                }}
+                className={`flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
+                  selected
+                    ? "bg-blue-500/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100"
+                }`}
+              >
+                <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded bg-slate-100 px-1 text-[10px] font-bold dark:bg-slate-800">
+                  {option.stepLabel}
+                </span>
+
+                <span className="min-w-0 flex-1 truncate">{option.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SceneContent({
   video,
   tracking,
   currentTimeSec,
   trackingEnabled,
   trajectory,
-}: KitchenSceneProps) {
+  selectedQuestionKey,
+}: SceneContentProps) {
   const kitchenRef = useRef<THREE.Object3D | null>(null);
   const pointHoverBlockRef = useRef(false);
   const [hoveredObject, setHoveredObject] = useState<THREE.Object3D | null>(
@@ -789,21 +945,30 @@ function SceneContent({
   }
 
   function getFixture(trajectory: TrajectoryData | null | undefined) {
+    const step4 = trajectory?.incremental_steps?.find(
+      (step) => String(step.step) === "4",
+    );
+
     return (
-      trajectory?.incremental_steps?.[3]?.answer_metadata
-        ?.raw_correct_fixture ?? "ciaociaocioac"
+      step4?.answer_metadata?.raw_correct_fixture ??
+      step4?.answer_metadata?.correct_fixture ??
+      null
     );
   }
 
-  function getIncrementalStepWorldPoint(stepNumber: number): WorldPoint | null {
-    const step = getIncrementalSteps().find((s) => s.step === stepNumber);
+  function getIncrementalStepWorldPoint(
+    stepNumber: number | string,
+  ): WorldPoint | null {
+    const step = getIncrementalSteps().find(
+      (s) => String(s.step) === String(stepNumber),
+    );
 
     if (!step) return null;
 
     return makeWorldPointFromMeta(step.answer_metadata as AnswerMetadata);
   }
 
-  function getPostStep4AnchorWorldPoint(): WorldPoint | null {
+  function getBranchStep(stepKey: SceneQuestionKey) {
     if (!trajectory) return null;
 
     const branchGroups = trajectory.branch_groups as Record<string, any[]>;
@@ -813,7 +978,26 @@ function SceneContent({
       return null;
     }
 
-    const anchorStep = postStep4[1];
+    return postStep4.find((step) => String(step.step) === stepKey) ?? null;
+  }
+
+  function getBranchTargetWorldPoint(stepKey: SceneQuestionKey) {
+    const step = getBranchStep(stepKey);
+
+    if (!step?.answer_metadata) return null;
+
+    return (
+      makeWorldPointFromMeta(
+        step.answer_metadata as AnswerMetadata,
+        "object_x",
+      ) ?? makeWorldPointFromMeta(step.answer_metadata as AnswerMetadata)
+    );
+  }
+
+  function getBranchAnchorWorldPoint(
+    stepKey: SceneQuestionKey,
+  ): WorldPoint | null {
+    const anchorStep = getBranchStep(stepKey) ?? getBranchStep("5b");
 
     if (!anchorStep?.answer_metadata) {
       return null;
@@ -825,10 +1009,58 @@ function SceneContent({
     );
   }
 
-  const lastSeen = getIncrementalStepWorldPoint(2);
+  function getSelectedTargetWorldPoint(): WorldPoint | null {
+    if (selectedQuestionKey === "all") {
+      return (
+        getBranchTargetWorldPoint("5b") ??
+        getIncrementalStepWorldPoint(3) ??
+        getIncrementalStepWorldPoint(2)
+      );
+    }
+    if (selectedQuestionKey === "1") return getIncrementalStepWorldPoint(2);
+    if (selectedQuestionKey === "2") return getIncrementalStepWorldPoint(2);
+    if (selectedQuestionKey === "3") return getIncrementalStepWorldPoint(3);
+    if (selectedQuestionKey === "4") {
+      return getIncrementalStepWorldPoint(3) ?? getIncrementalStepWorldPoint(2);
+    }
+    if (selectedQuestionKey === "5a") {
+      return (
+        getBranchTargetWorldPoint("5a") ??
+        getIncrementalStepWorldPoint(3) ??
+        getIncrementalStepWorldPoint(2)
+      );
+    }
+    if (selectedQuestionKey === "5b" || selectedQuestionKey === "5c") {
+      return (
+        getBranchTargetWorldPoint(selectedQuestionKey) ??
+        getIncrementalStepWorldPoint(3) ??
+        getIncrementalStepWorldPoint(2)
+      );
+    }
+
+    return getIncrementalStepWorldPoint(2);
+  }
+
+  const showTarget =
+    selectedQuestionKey === "all" ||
+    selectedQuestionKey === "1" ||
+    selectedQuestionKey === "2" ||
+    selectedQuestionKey === "3" ||
+    selectedQuestionKey === "4" ||
+    selectedQuestionKey === "5a" ||
+    selectedQuestionKey === "5b" ||
+    selectedQuestionKey === "5c";
+  const showFixture =
+    selectedQuestionKey === "all" || selectedQuestionKey === "4";
+  const showAnchor =
+    selectedQuestionKey === "all" ||
+    selectedQuestionKey === "5b" ||
+    selectedQuestionKey === "5c";
+
+  const targetObject = getSelectedTargetWorldPoint();
 
   const fixture = getFixture(trajectory);
-  const anchor = getPostStep4AnchorWorldPoint();
+  const anchor = getBranchAnchorWorldPoint(selectedQuestionKey);
 
   return (
     <>
@@ -837,9 +1069,9 @@ function SceneContent({
 
       <KitchenModel videoId={video?.id} modelRef={kitchenRef} />
 
-      {lastSeen && (
+      {showTarget && targetObject && (
         <mesh
-          position={lastSeen.worldCoord}
+          position={targetObject.worldCoord}
           onPointerOver={(event) => {
             event.stopPropagation();
 
@@ -848,7 +1080,7 @@ function SceneContent({
 
             setHoveredPointLabel({
               label: "target object",
-              position: lastSeen.worldCoord,
+              position: targetObject.worldCoord,
             });
           }}
           onPointerOut={(event) => {
@@ -867,7 +1099,7 @@ function SceneContent({
         </mesh>
       )}
 
-      {anchor && (
+      {showAnchor && anchor && (
         <mesh
           position={anchor.worldCoord}
           onPointerOver={(event) => {
@@ -897,7 +1129,9 @@ function SceneContent({
         </mesh>
       )}
 
-      <FixtureObjectEdges targetRoot={kitchenRef} rawFixture={fixture} />
+      {showFixture && fixture && (
+        <FixtureObjectEdges targetRoot={kitchenRef} rawFixture={fixture} />
+      )}
 
       <HoverObjectHighlighter
         targetRoot={kitchenRef}
@@ -1128,6 +1362,34 @@ function TrackingOrbitControls({
 export function KitchenScene(props: KitchenSceneProps) {
   const trackingEnabled = props.trackingEnabled;
   const setTrackingEnabled = props.onTrackingEnabledChange;
+  const questionOptions = useMemo(
+    () => getSceneQuestionOptions(props.trajectory),
+    [props.trajectory],
+  );
+  const [selectedQuestionKey, setSelectedQuestionKey] =
+    useState<SceneQuestionKey>("all");
+
+  useEffect(() => {
+    if (questionOptions.some((option) => option.key === selectedQuestionKey)) {
+      return;
+    }
+
+    setSelectedQuestionKey(
+      questionOptions.some((option) => option.key === "all")
+        ? "all"
+        : (questionOptions[0]?.key ?? "1"),
+    );
+  }, [questionOptions, selectedQuestionKey]);
+
+  const handleQuestionChange = (key: SceneQuestionKey) => {
+    setSelectedQuestionKey(key);
+
+    const queryTimeSec = props.queryTimeSec ?? props.trajectory?.query_time_sec;
+
+    if (queryTimeSec !== undefined) {
+      props.onSeek?.(queryTimeSec);
+    }
+  };
 
   if (!props.tracking) {
     return (
@@ -1139,37 +1401,53 @@ export function KitchenScene(props: KitchenSceneProps) {
 
   return (
     <div className="relative h-full min-h-100 w-full bg-slate-100 dark:bg-black">
-      <div className="absolute left-3 top-3 z-10 flex w-[calc(100%-1.5rem)] justify-between">
+      <div className="absolute left-3 right-3 top-3 z-10 flex min-w-0 items-start gap-2">
         {/* Tracking Button */}
-        <button
-          type="button"
-          onClick={() => setTrackingEnabled(!trackingEnabled)}
-          className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${
-            trackingEnabled
-              ? [
-                  "border-slate-300/40 bg-slate-100/60 text-blue-500",
-                  "shadow-[0_0_12px_rgba(59,130,246,0.22)]",
-                  "border-slate-400/50 hover:bg-slate-200/70 hover:text-blue-600",
+        <div className="flex-none">
+          <button
+            type="button"
+            onClick={() => setTrackingEnabled(!trackingEnabled)}
+            className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-semibold transition-all ${
+              trackingEnabled
+                ? [
+                    "border-slate-300/40 bg-slate-100/60 text-blue-500",
+                    "shadow-[0_0_12px_rgba(59,130,246,0.22)]",
+                    "border-slate-400/50 hover:bg-slate-200/70 hover:text-blue-600",
 
-                  "dark:border-[#3a6abf]/80 dark:bg-[#0f1e3d] dark:text-[#6ab0ff]",
-                  "dark:shadow-[0_0_14px_rgba(59,130,246,0.35)]",
-                  "dark:hover:bg-[#132347] dark:hover:text-[#89c2ff]",
-                  "dark:hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]",
-                ].join(" ")
-              : [
-                  "border-slate-300/40 bg-slate-100/60 text-slate-400",
-                  "shadow-none",
-                  "border-slate-400/50 hover:bg-slate-200/70 hover:text-slate-500",
+                    "dark:border-[#3a6abf]/80 dark:bg-[#0f1e3d] dark:text-[#6ab0ff]",
+                    "dark:shadow-[0_0_14px_rgba(59,130,246,0.35)]",
+                    "dark:hover:bg-[#132347] dark:hover:text-[#89c2ff]",
+                    "dark:hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]",
+                  ].join(" ")
+                : [
+                    "border-slate-300/40 bg-slate-100/60 text-slate-400",
+                    "shadow-none",
+                    "border-slate-400/50 hover:bg-slate-200/70 hover:text-slate-500",
 
-                  // Dark mode — like before
-                  "dark:border-[#1e2f45]/60 dark:bg-[#0d1520] dark:text-[#3d5270]",
-                  "dark:hover:bg-[#101a28] dark:hover:text-[#4e6585]",
-                  "dark:hover:border-[#253a56]/60",
-                ].join(" ")
-          }`}
-        >
-          {trackingEnabled ? "Tracking: On" : "Tracking: Off"}
-        </button>
+                    "dark:border-[#1e2f45]/60 dark:bg-[#0d1520] dark:text-[#3d5270]",
+                    "dark:hover:bg-[#101a28] dark:hover:text-[#4e6585]",
+                    "dark:hover:border-[#253a56]/60",
+                  ].join(" ")
+            }`}
+          >
+            <span className="hidden sm:inline">
+              {trackingEnabled ? "Tracking: On" : "Tracking: Off"}
+            </span>
+
+            <span className="inline sm:hidden">
+              {trackingEnabled ? "On" : "Off"}
+            </span>
+          </button>
+        </div>
+
+        {/* Dropdown shrinks between the two buttons */}
+        <div className="min-w-[32px] flex-1">
+          <SceneQuestionDropdown
+            value={selectedQuestionKey}
+            options={questionOptions}
+            onChange={handleQuestionChange}
+          />
+        </div>
 
         {/* Query Time Button */}
         {props.queryTimeSec !== undefined && props.onSeek && (
@@ -1177,14 +1455,12 @@ export function KitchenScene(props: KitchenSceneProps) {
             type="button"
             onClick={() => props.onSeek!(props.queryTimeSec!)}
             className={[
-              "rounded-full border px-4 py-1.5 text-xs font-semibold transition-all select-none",
+              "flex-none shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-semibold transition-all select-none",
 
-              // Light mode — same as Tracking active
               "border-slate-300/40 bg-slate-100/60 text-blue-500",
               "shadow-[0_0_12px_rgba(59,130,246,0.22)]",
               "border-slate-400/50 hover:bg-slate-200/70 hover:text-blue-600",
 
-              // Dark mode — same as Tracking active
               "dark:border-[#3a6abf]/80 dark:bg-[#0f1e3d] dark:text-[#6ab0ff]",
               "dark:shadow-[0_0_14px_rgba(59,130,246,0.35)]",
               "dark:hover:bg-[#132347] dark:hover:text-[#89c2ff]",
@@ -1197,7 +1473,7 @@ export function KitchenScene(props: KitchenSceneProps) {
       </div>
 
       <Canvas camera={{ position: [2, 2, 4], fov: 50 }}>
-        <SceneContent {...props} />
+        <SceneContent {...props} selectedQuestionKey={selectedQuestionKey} />
       </Canvas>
     </div>
   );
