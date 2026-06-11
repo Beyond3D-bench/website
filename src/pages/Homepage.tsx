@@ -9,37 +9,37 @@ const capabilities = [
   {
     code: "Step 1",
     title: "Current visibility check",
-    desc: "At time <TIME HH:MM:SS video X>, is <Target Object> that was moved earlier visible in the current frame?",
+    desc: "At the current time <TIME HH:MM:SS video X>, is the previously moved <Target Object> visible in the current frame?",
   },
   {
     code: "Step 2",
     title: "Last visible observation",
-    desc: "At time <TIME HH:MM:SS video X>, <Target Object> that was moved earlier is not visible. When was it last visible, and where was it located in the image?",
+    desc: "The <Target Object> was moved earlier in the video. When was it last visible, and where was it located in the image at that moment?",
   },
   {
     code: "Step 3",
     title: "Last placement observation",
-    desc: "At time <TIME HH:MM:SS video X>, when was the <Target Object> last placed, and where was it placed?",
+    desc: "The <Target Object> was moved earlier in the video. At what time did it stop moving? Where was it located in the image at that moment?",
   },
   {
     code: "Step 4",
     title: "Scene anchor",
-    desc: "At time <TIME HH:MM:SS video X>, based on the last placement of <Target Object> that was moved earlier, which nearby fixture is closest to it?",
+    desc: "At the current time <TIME HH:MM:SS video X>, based on the last known position of the <Target Object> that was moved earlier, which counter area is closest to it?",
   },
   {
-    code: "Step 5.1",
+    code: "Step 5.a",
     title: "Egocentric object-camera relation inference",
-    desc: "At time <TIME HH:MM:SS video X>, <Target Object> is not visible. Based on its last known position, in which direction is <Target Object> based on where you are looking at, at time <TIME HH:MM:SS video X>?",
+    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, in which direction is the <Target Object> from your viewpoint?",
   },
   {
-    code: "Step 5.2",
+    code: "Step 5.b",
     title: "Egocentric object-object relation",
-    desc: "At time <TIME HH:MM:SS video X>, <Target Object> is not visible. Based on the last known position of <Target Object> and the <Anchored Object> (marked object) in the current frame, where is <Target Object> relative to <Anchored Object>?",
+    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, and using the current position of the <Anchor Object> in the current frame, where is the <Target Object> relative to <Anchor Object> from your viewpoint?",
   },
   {
-    code: "Step 5.3",
+    code: "Step 5.c",
     title: "Object-object distance",
-    desc: "At time <TIME HH:MM:SS video X>, <Target Object> is not visible. Based on the last known position of <Target Object> and the marked object soap dispenser in the current frame, how far is <Target Object> from <Anchored Object>?",
+    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, and using the current position of the <Anchor Object> in the current frame, how far is the <Target Object> from the <Anchor Object>: close, less than 1 meter; medium, at least 1 meter but less than 1.5 meters; or far, 1.5 meters or more?",
   },
 ];
 
