@@ -251,6 +251,7 @@ const PANEL_BALANCE_THRESHOLD_PERCENT = 40;
 const PANEL_MAX_PERCENT = 90;
 const DEFAULT_LEFT_PANEL_PERCENT = 24;
 const DEFAULT_RIGHT_PANEL_PERCENT = 28;
+const RESIZE_TOUCH_ACTION = "none";
 
 type ActivePanel = "questions" | "json";
 type LeftPanel = "selector" | "3d";
@@ -364,10 +365,19 @@ export default function QuestionView() {
     const layoutWidth = layoutRef.current?.getBoundingClientRect().width ?? 0;
     if (layoutWidth <= 0) return;
 
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Some browsers can reject pointer capture after interrupted gestures.
+    }
+
     setResizingSide("left");
 
     const startX = event.clientX;
     const startWidth = leftWidth;
+    const previousBodyCursor = document.body.style.cursor;
+    const previousBodyUserSelect = document.body.style.userSelect;
+    const previousBodyTouchAction = document.body.style.touchAction;
     let latestWidths: PanelWidths = {
       left: leftWidth,
       right: rightWidth,
@@ -398,15 +408,19 @@ export default function QuestionView() {
 
       document.removeEventListener("pointermove", handlePointerMove);
       document.removeEventListener("pointerup", handlePointerUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      document.removeEventListener("pointercancel", handlePointerUp);
+      document.body.style.cursor = previousBodyCursor;
+      document.body.style.userSelect = previousBodyUserSelect;
+      document.body.style.touchAction = previousBodyTouchAction;
     };
 
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
+    document.body.style.touchAction = RESIZE_TOUCH_ACTION;
 
     document.addEventListener("pointermove", handlePointerMove);
     document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerUp);
   };
 
   const startResizeRight = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -415,10 +429,19 @@ export default function QuestionView() {
     const layoutWidth = layoutRef.current?.getBoundingClientRect().width ?? 0;
     if (layoutWidth <= 0) return;
 
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Some browsers can reject pointer capture after interrupted gestures.
+    }
+
     setResizingSide("right");
 
     const startX = event.clientX;
     const startWidth = rightWidth;
+    const previousBodyCursor = document.body.style.cursor;
+    const previousBodyUserSelect = document.body.style.userSelect;
+    const previousBodyTouchAction = document.body.style.touchAction;
     let latestWidths: PanelWidths = {
       left: leftWidth,
       right: rightWidth,
@@ -449,15 +472,19 @@ export default function QuestionView() {
 
       document.removeEventListener("pointermove", handlePointerMove);
       document.removeEventListener("pointerup", handlePointerUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      document.removeEventListener("pointercancel", handlePointerUp);
+      document.body.style.cursor = previousBodyCursor;
+      document.body.style.userSelect = previousBodyUserSelect;
+      document.body.style.touchAction = previousBodyTouchAction;
     };
 
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
+    document.body.style.touchAction = RESIZE_TOUCH_ACTION;
 
     document.addEventListener("pointermove", handlePointerMove);
     document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerUp);
   };
 
   const [selectedUserId, setSelectedUserId] = useState(initialSelection.userId);
@@ -659,13 +686,13 @@ export default function QuestionView() {
         role="separator"
         aria-orientation="vertical"
         onPointerDown={startResizeLeft}
-        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition-opacity ${
+        className={`group relative z-20 w-1 shrink-0 touch-none cursor-col-resize select-none transition-opacity ${
           resizingSide === "left"
             ? "bg-blue-500 opacity-80"
             : "bg-slate-200 hover:bg-blue-500 dark:bg-white/[0.07] dark:hover:bg-blue-500"
         }`}
       >
-        <div className="absolute left-1/2 top-0 h-full w-4 -translate-x-1/2" />
+        <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 md:w-4" />
       </div>
       {/* MIDDLE: video always visible */}
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
@@ -687,13 +714,13 @@ export default function QuestionView() {
         role="separator"
         aria-orientation="vertical"
         onPointerDown={startResizeRight}
-        className={`group relative z-20 w-1 shrink-0 cursor-col-resize transition-opacity ${
+        className={`group relative z-20 w-1 shrink-0 touch-none cursor-col-resize select-none transition-opacity ${
           resizingSide === "right"
             ? "bg-blue-500 opacity-80"
             : "bg-slate-200 hover:bg-blue-500 dark:bg-white/[0.07] dark:hover:bg-blue-500"
         }`}
       >
-        <div className="absolute left-1/2 top-0 h-full w-4 -translate-x-1/2" />
+        <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 md:w-4" />
       </div>
       <aside
         style={{ width: `${rightWidth}%` }}
