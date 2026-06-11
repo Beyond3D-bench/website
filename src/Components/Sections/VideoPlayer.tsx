@@ -14,6 +14,7 @@ interface VideoPlayerProps {
   trajectory: TrajectoryData | null | undefined;
   currentTimeSec: number;
   onTimeChange: (t: number) => void;
+  controlsOnly?: boolean;
 }
 
 type VisiblePane = "both" | "sampled" | "full";
@@ -653,6 +654,7 @@ export function VideoPlayer({
   trajectory,
   currentTimeSec,
   onTimeChange,
+  controlsOnly = false,
 }: VideoPlayerProps) {
   const [duration, setDuration] = useState(video.duration ?? 220);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -1072,8 +1074,18 @@ export function VideoPlayer({
   }, [playPauseAllPlayers, seekAllPlayers]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-      <div className="relative flex min-h-0 flex-1 gap-px bg-slate-200 dark:bg-slate-800/40">
+    <div
+      className={`flex min-h-0 flex-col bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-100 ${
+        controlsOnly ? "relative h-auto shrink-0" : "h-full"
+      }`}
+    >
+      <div
+        className={`relative min-h-0 gap-px bg-slate-200 dark:bg-slate-800/40 ${
+          controlsOnly
+            ? "pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden opacity-0"
+            : "flex flex-1"
+        }`}
+      >
         {visiblePane === "full" && (
           <PaneToggleButton
             side="left"

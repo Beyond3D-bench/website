@@ -24,6 +24,7 @@ const STORAGE_KEYS = {
   selectedVideoId: "questionView.selectedVideoId",
   selectedTrajectoryByVideo: "questionView.selectedTrajectoryByVideo",
   activePanel: "questionView.activePanel",
+  mobileMediaPanel: "questionView.mobileMediaPanel",
   trackingEnabled3d: "questionView.trackingEnabled3d",
   leftPanelWidth: "questionView.leftPanelWidth",
   rightPanelWidth: "questionView.rightPanelWidth",
@@ -225,13 +226,136 @@ function TrajectoryDropdown({
                   onChange(key);
                   setOpen(false);
                 }}
-                className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-[12px] transition-colors ${
+                className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-[12px] transition-colors focus:outline-none ${
                   selected
-                    ? "bg-blue-500/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100"
+                    ? "bg-blue-500/10 text-blue-700 hover:bg-blue-500/15 active:bg-blue-500/20 focus-visible:bg-blue-500/15 dark:bg-blue-500/15 dark:text-blue-300 dark:hover:bg-blue-500/20 dark:active:bg-blue-500/25 dark:focus-visible:bg-blue-500/20"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:bg-blue-500/10 active:text-blue-700 focus-visible:bg-slate-100 focus-visible:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100 dark:active:bg-blue-500/15 dark:active:text-blue-300 dark:focus-visible:bg-white/6 dark:focus-visible:text-slate-100"
                 }`}
               >
                 <span className="truncate">{key}</span>
+
+                {selected && <Check className="h-3.5 w-3.5 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobilePillDropdown({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: Array<{
+    value: string;
+    label: string;
+    badge?: string;
+  }>;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+
+      if (target && dropdownRef.current?.contains(target)) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const selectedOption =
+    options.find((option) => option.value === value) ?? options[0];
+
+  if (!selectedOption) return null;
+
+  return (
+    <div ref={dropdownRef} className="relative z-30 min-w-0">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className={`flex h-9 w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded-full border px-3 text-left text-xs font-semibold transition-all ${
+          open
+            ? "border-blue-400 bg-white/90 text-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.22)] dark:border-[#3a6abf]/80 dark:bg-[#0f1e3d] dark:text-[#6ab0ff]"
+            : "border-slate-300/40 bg-slate-100/70 text-slate-600 hover:bg-slate-200/80 hover:text-blue-600 dark:border-[#1e2f45]/60 dark:bg-[#0d1520] dark:text-slate-300 dark:hover:bg-[#101a28] dark:hover:text-[#89c2ff]"
+        }`}
+      >
+        <span className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+          {selectedOption.badge && (
+            <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 px-1.5 text-[10px] font-bold text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
+              {selectedOption.badge}
+            </span>
+          )}
+
+          <span className="min-w-0 flex-1 truncate">
+            {selectedOption.label}
+          </span>
+        </span>
+
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <div
+        className={`absolute left-0 top-full z-50 mt-2 w-full min-w-44 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-900/15 transition-all dark:border-white/[0.07] dark:bg-slate-950 dark:shadow-black/40 ${
+          open
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-1 opacity-0"
+        }`}
+      >
+        <div className="max-h-64 overflow-y-auto p-1">
+          {options.map((option) => {
+            const selected = option.value === selectedOption.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+                className={`flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors focus:outline-none ${
+                  selected
+                    ? "bg-blue-500/10 text-blue-700 hover:bg-blue-500/15 active:bg-blue-500/20 focus-visible:bg-blue-500/15 dark:bg-blue-500/15 dark:text-blue-300 dark:hover:bg-blue-500/20 dark:active:bg-blue-500/25 dark:focus-visible:bg-blue-500/20"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:bg-blue-500/10 active:text-blue-700 focus-visible:bg-slate-100 focus-visible:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100 dark:active:bg-blue-500/15 dark:active:text-blue-300 dark:focus-visible:bg-white/6 dark:focus-visible:text-slate-100"
+                }`}
+              >
+                {option.badge && (
+                  <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded bg-slate-100 px-1 text-[10px] font-bold dark:bg-slate-800">
+                    {option.badge}
+                  </span>
+                )}
+
+                <span className="min-w-0 flex-1 truncate">{option.label}</span>
 
                 {selected && <Check className="h-3.5 w-3.5 shrink-0" />}
               </button>
@@ -255,6 +379,7 @@ const RESIZE_TOUCH_ACTION = "none";
 
 type ActivePanel = "questions" | "json";
 type LeftPanel = "selector" | "3d";
+type MobileMediaPanel = "video" | "3d";
 type PanelWidths = {
   left: number;
   right: number;
@@ -266,6 +391,14 @@ function getInitialActivePanel(): ActivePanel {
   const saved = localStorage.getItem(STORAGE_KEYS.activePanel);
 
   return saved === "questions" || saved === "json" ? saved : "questions";
+}
+
+function getInitialMobileMediaPanel(): MobileMediaPanel {
+  if (typeof window === "undefined") return "video";
+
+  const saved = localStorage.getItem(STORAGE_KEYS.mobileMediaPanel);
+
+  return saved === "video" || saved === "3d" ? saved : "video";
 }
 
 function getInitialTrackingEnabled3d(): boolean {
@@ -334,7 +467,30 @@ function getPanelWidthsForResize(
       };
 }
 
+function useIsMobileQuestionView() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window === "undefined"
+      ? false
+      : window.matchMedia("(max-width: 767px)").matches,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const handleChange = () => setIsMobile(mediaQuery.matches);
+
+    handleChange();
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  return isMobile;
+}
+
 export default function QuestionView() {
+  const isMobile = useIsMobileQuestionView();
   const [initialSelection] = useState(() => getInitialVideoSelection());
   const [tracking, setTracking] = useState<TrackingEntry | null>(null);
   const layoutRef = useRef<HTMLDivElement | null>(null);
@@ -496,6 +652,8 @@ export default function QuestionView() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(() =>
     getInitialActivePanel(),
   );
+  const [mobileMediaPanel, setMobileMediaPanel] =
+    useState<MobileMediaPanel>(() => getInitialMobileMediaPanel());
   const [trackingEnabled3d, setTrackingEnabled3d] = useState(() =>
     getInitialTrackingEnabled3d(),
   );
@@ -537,6 +695,9 @@ export default function QuestionView() {
       ? selectedVideo.trajectory[selectedTrajectoryKey]
       : (Object.values(selectedVideo.trajectory)[0] ?? null)
     : null;
+  const trajectoryOptions = selectedVideo?.trajectory
+    ? Object.keys(selectedVideo.trajectory)
+    : [];
 
   // Auto-set trajectory key when video changes
   useEffect(() => {
@@ -556,6 +717,10 @@ export default function QuestionView() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.activePanel, activePanel);
   }, [activePanel]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.mobileMediaPanel, mobileMediaPanel);
+  }, [mobileMediaPanel]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -590,6 +755,177 @@ export default function QuestionView() {
     if (user?.videos[0]) setSelectedVideoId(user.videos[0].id);
     setCurrentTimeSec(0);
   };
+
+  const renderKitchenScene = (className = "h-full") => (
+    <div className={className}>
+      <SceneErrorBoundary
+        key={selectedTrajectory?.trajectory_id ?? selectedVideo?.id ?? "scene"}
+        fallback={
+          <div className="flex h-full items-center justify-center bg-white p-4 dark:bg-slate-950/80">
+            <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center shadow-sm dark:border-white/[0.07] dark:bg-slate-900/70">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                3D scene unavailable
+              </h3>
+
+              <p className="mt-1 text-[12px] leading-5 text-slate-500 dark:text-slate-400">
+                The scene could not be rendered for this trajectory. You can
+                still use the video and question panel.
+              </p>
+            </div>
+          </div>
+        }
+      >
+        <KitchenScene
+          video={selectedVideo}
+          tracking={tracking}
+          trajectory={selectedTrajectory}
+          currentTimeSec={currentTimeSec}
+          trackingEnabled={trackingEnabled3d}
+          onTrackingEnabledChange={setTrackingEnabled3d}
+          queryTimeSec={selectedTrajectory?.query_time_sec ?? 0}
+          onSeek={(t: number) => setCurrentTimeSec(t)}
+        />
+      </SceneErrorBoundary>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="min-h-[calc(100vh-77px)] overflow-y-auto bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+        <section className="border-b border-slate-200 bg-white dark:border-white/[0.07] dark:bg-slate-950">
+          <div className="flex flex-col gap-3 px-3 py-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="grid h-9 shrink-0 grid-cols-2 rounded-lg border border-slate-200 bg-slate-100 p-0.5 dark:border-white/[0.07] dark:bg-slate-900">
+                {(["video", "3d"] as const).map((panel) => (
+                  <button
+                    key={panel}
+                    type="button"
+                    onClick={() => setMobileMediaPanel(panel)}
+                    className={`flex h-8 w-16 items-center justify-center gap-1.5 rounded-md text-[12px] font-semibold transition-colors ${
+                      mobileMediaPanel === panel
+                        ? "bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+                    }`}
+                  >
+                    {panel === "video" ? (
+                      <Video className="h-3.5 w-3.5" />
+                    ) : (
+                      <Box className="h-3.5 w-3.5" />
+                    )}
+                    {panel === "video" ? "Video" : "3D"}
+                  </button>
+                ))}
+              </div>
+
+              {trajectoryOptions.length > 1 && (
+                <div className="min-w-0 flex-1">
+                  <MobilePillDropdown
+                    value={selectedTrajectoryKey ?? trajectoryOptions[0]}
+                    options={trajectoryOptions.map((key) => ({
+                      value: key,
+                      label: key,
+                      badge: "OOS",
+                    }))}
+                    onChange={setSelectedTrajectoryKey}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <MobilePillDropdown
+                value={selectedUserId}
+                options={USERS.map((user) => ({
+                  value: user.userId,
+                  label: user.userId,
+                  badge: String(user.videos.length),
+                }))}
+                onChange={handleUserChange}
+              />
+
+              <MobilePillDropdown
+                value={selectedVideoId}
+                options={(selectedUser?.videos ?? []).map((video, index) => ({
+                  value: video.id,
+                  label: video.id,
+                  badge: `V${index + 1}`,
+                }))}
+                onChange={(videoId) => {
+                  setSelectedVideoId(videoId);
+                  setTimeout(() => setCurrentTimeSec(0), 0);
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="flex h-[44vh] min-h-[300px] max-h-[430px] flex-col overflow-hidden border-t border-slate-200 bg-slate-100 dark:border-white/[0.07] dark:bg-black">
+            {selectedVideo ? (
+              <>
+                {mobileMediaPanel === "3d" && (
+                  <div className="min-h-0 flex-1 overflow-hidden">
+                    {renderKitchenScene()}
+                  </div>
+                )}
+
+                <VideoPlayer
+                  key={selectedVideo.id}
+                  video={selectedVideo}
+                  trajectory={selectedTrajectory}
+                  currentTimeSec={currentTimeSec}
+                  onTimeChange={setCurrentTimeSec}
+                  controlsOnly={mobileMediaPanel === "3d"}
+                />
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-slate-500 dark:text-slate-600">
+                No video selected
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="bg-slate-50 dark:bg-slate-950">
+          <div className="sticky top-0 z-20 flex border-b border-slate-200 bg-white px-3 dark:border-white/[0.07] dark:bg-slate-950">
+            {(["questions", "json"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActivePanel(tab)}
+                className={`flex-1 border-b-2 px-3 py-3 text-[13px] font-medium transition-all ${
+                  activePanel === tab
+                    ? "border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                }`}
+              >
+                {tab === "questions" ? "Questions" : "{ } JSON"}
+              </button>
+            ))}
+          </div>
+
+          <div className="min-h-[55vh]">
+            {activePanel === "questions" ? (
+              <QuestionPanel
+                trajectory={selectedTrajectory}
+                currentTimeSec={currentTimeSec}
+                onSeek={setCurrentTimeSec}
+              />
+            ) : (
+              <JsonViewer
+                data={
+                  selectedVideo?.rawJson ??
+                  (selectedTrajectory ? selectedTrajectory : null)
+                }
+              />
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -643,42 +979,7 @@ export default function QuestionView() {
               />
             </div>
           ) : (
-            <SceneErrorBoundary
-              key={
-                selectedTrajectory?.trajectory_id ??
-                selectedVideo?.id ??
-                "scene"
-              }
-              fallback={
-                <div className="flex h-full items-center justify-center bg-white p-4 dark:bg-slate-950/80">
-                  <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center shadow-sm dark:border-white/[0.07] dark:bg-slate-900/70">
-                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
-                      <AlertTriangle className="h-5 w-5" />
-                    </div>
-
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      3D scene unavailable
-                    </h3>
-
-                    <p className="mt-1 text-[12px] leading-5 text-slate-500 dark:text-slate-400">
-                      The scene could not be rendered for this trajectory. You
-                      can still use the video and question panel.
-                    </p>
-                  </div>
-                </div>
-              }
-            >
-              <KitchenScene
-                video={selectedVideo}
-                tracking={tracking}
-                trajectory={selectedTrajectory}
-                currentTimeSec={currentTimeSec}
-                trackingEnabled={trackingEnabled3d}
-                onTrackingEnabledChange={setTrackingEnabled3d}
-                queryTimeSec={selectedTrajectory?.query_time_sec ?? 0}
-                onSeek={(t: number) => setCurrentTimeSec(t)}
-              />
-            </SceneErrorBoundary>
+            renderKitchenScene()
           )}
         </div>
       </aside>
@@ -752,15 +1053,14 @@ export default function QuestionView() {
 
         {/* Trajectory selector */}
         {activePanel === "questions" &&
-          selectedVideo?.trajectory &&
-          Object.keys(selectedVideo.trajectory).length > 1 && (
+          trajectoryOptions.length > 1 && (
             <div className="shrink-0 border-b border-slate-200 px-4 py-3 dark:border-white/[0.07]">
               <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                 Trajectory
               </label>
               <TrajectoryDropdown
                 value={selectedTrajectoryKey}
-                options={Object.keys(selectedVideo.trajectory)}
+                options={trajectoryOptions}
                 onChange={setSelectedTrajectoryKey}
               />
             </div>

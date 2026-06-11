@@ -165,6 +165,27 @@ function writeSavedCameraView(camera: THREE.Camera, target: THREE.Vector3) {
 
 function CameraMarker({ matrix }: { matrix: THREE.Matrix4 }) {
   const yawCorrection = 0.0;
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    typeof document === "undefined"
+      ? false
+      : document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const root = document.documentElement;
+    const updateTheme = () => setIsDarkMode(root.classList.contains("dark"));
+    const observer = new MutationObserver(updateTheme);
+
+    updateTheme();
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <group matrix={matrix} matrixAutoUpdate={false}>
@@ -175,9 +196,9 @@ function CameraMarker({ matrix }: { matrix: THREE.Matrix4 }) {
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 4, 0, 0]}>
           <coneGeometry args={[0.055, 0.16, 24]} />
           <meshStandardMaterial
-            color="#dbeafe"
-            emissive="#93c5fd"
-            emissiveIntensity={2.0}
+            color={isDarkMode ? "#dbeafe" : "#020617"}
+            emissive={isDarkMode ? "#93c5fd" : "#000000"}
+            emissiveIntensity={isDarkMode ? 2.0 : 0}
           />
         </mesh>
       </group>
@@ -801,10 +822,10 @@ function SceneQuestionDropdown({
                   onChange(option.key);
                   setOpen(false);
                 }}
-                className={`flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
+                className={`flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors focus:outline-none ${
                   selected
-                    ? "bg-blue-500/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100"
+                    ? "bg-blue-500/10 text-blue-700 hover:bg-blue-500/15 active:bg-blue-500/20 focus-visible:bg-blue-500/15 dark:bg-blue-500/15 dark:text-blue-300 dark:hover:bg-blue-500/20 dark:active:bg-blue-500/25 dark:focus-visible:bg-blue-500/20"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:bg-blue-500/10 active:text-blue-700 focus-visible:bg-slate-100 focus-visible:text-slate-950 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-slate-100 dark:active:bg-blue-500/15 dark:active:text-blue-300 dark:focus-visible:bg-white/6 dark:focus-visible:text-slate-100"
                 }`}
               >
                 <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded bg-slate-100 px-1 text-[10px] font-bold dark:bg-slate-800">
@@ -1411,7 +1432,7 @@ export function KitchenScene(props: KitchenSceneProps) {
   }
 
   return (
-    <div className="relative h-full min-h-100 w-full bg-slate-100 dark:bg-black">
+    <div className="relative h-full min-h-0 w-full bg-slate-100 dark:bg-black md:min-h-100">
       <div className="absolute left-3 right-3 top-3 z-10 flex min-w-0 items-start gap-2">
         {/* Tracking Button */}
         <div className="flex-none">
