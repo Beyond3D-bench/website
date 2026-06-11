@@ -997,16 +997,27 @@ function SceneContent({
   function getBranchAnchorWorldPoint(
     stepKey: SceneQuestionKey,
   ): WorldPoint | null {
-    const anchorStep = getBranchStep(stepKey) ?? getBranchStep("5b");
-
-    if (!anchorStep?.answer_metadata) {
-      return null;
-    }
-
-    return makeWorldPointFromMeta(
-      anchorStep.answer_metadata as AnswerMetadata,
+    const selectedAnchorStep = getBranchStep(stepKey);
+    const selectedAnchorPoint = makeWorldPointFromMeta(
+      selectedAnchorStep?.answer_metadata as AnswerMetadata | undefined,
       "object_y",
     );
+
+    if (selectedAnchorPoint) {
+      return selectedAnchorPoint;
+    }
+
+    const objectRelationStep = getBranchStep("5b");
+    const objectRelationAnchorPoint = makeWorldPointFromMeta(
+      objectRelationStep?.answer_metadata as AnswerMetadata | undefined,
+      "object_y",
+    );
+
+    if (objectRelationAnchorPoint) {
+      return objectRelationAnchorPoint;
+    }
+
+    return makeWorldPoint(trajectory?.generation_info?.anchor_world_coordinates);
   }
 
   function getSelectedTargetWorldPoint(): WorldPoint | null {
