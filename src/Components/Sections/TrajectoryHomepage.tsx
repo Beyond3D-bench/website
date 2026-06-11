@@ -20,7 +20,7 @@ export default function Trajectory({
   return (
     <section
       ref={ref}
-      className={`fade-up mx-auto max-w-275 px-8 py-20 ${visible ? "in" : ""}`}
+      className={`fade-up mx-auto max-w-275 px-5 py-14 sm:px-8 sm:py-20 ${visible ? "in" : ""}`}
     >
       <div className="mb-6">
         <span className="font-mono text-[11px] uppercase tracking-widest text-blue-600 dark:text-blue-400">
@@ -32,7 +32,7 @@ export default function Trajectory({
         Multi-step spatial reasoning questions
       </h2>
 
-      <p className="mb-12 text-[15px] leading-7 text-slate-600 dark:text-[#5a6a88] text-center w-full">
+      <p className="mb-10 max-w-4xl text-sm leading-6 text-slate-600 sm:mb-12 sm:text-center sm:text-[15px] sm:leading-7 dark:text-[#5a6a88]">
         Models are asked with gradually increasing reasoning steps to track the
         target object that was moved or viewed in the past, and infer its
         spatial relation with the current scene. The questions are designed to
@@ -40,11 +40,11 @@ export default function Trajectory({
         egocentric video.
       </p>
 
-      <div className="relative mx-auto mt-14 max-w-3xl">
+      <div className="relative mx-auto mt-10 max-w-3xl sm:mt-14">
         {/* continuous line from first dot to last dot */}
         <div
           className="
-      absolute left-4 top-3.25
+      absolute left-3 top-3.25 sm:left-4
       w-px bg-slate-200 dark:bg-white/10
     "
           style={{
@@ -52,10 +52,8 @@ export default function Trajectory({
           }}
         />
 
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-6 sm:gap-10">
           {capabilities.map((c, index) => {
-            const isLast = index === capabilities.length - 1;
-
             return (
               <motion.div
                 key={c.code}
@@ -68,24 +66,20 @@ export default function Trajectory({
                   ease: "easeOut",
                 }}
                 className="
-        relative grid grid-cols-[32px_1fr] gap-6 pb-10
+        relative grid grid-cols-[24px_1fr] gap-4 pb-8 sm:grid-cols-[32px_1fr] sm:gap-6 sm:pb-10
 
-        before:absolute before:left-4 before:top-0
+        before:absolute before:left-3 before:top-0 sm:before:left-4
         before:h-3 before:w-px before:bg-transparent
 
-        after:absolute after:left-4 after:top-4
+        after:absolute after:left-3 after:top-4 sm:after:left-4
         after:w-px after:bg-slate-200 dark:after:bg-white/10
 
           last:after:hidden
       "
-                style={{
-                  // hide the line for last item
-                  ...(isLast && { ["--tw-content" as any]: "none" }),
-                }}
               >
                 {/* DOT */}
                 <div className="relative z-10 flex justify-center">
-                  <div className="mt-1 h-4 w-4 rounded-full bg-blue-600 ring-4 ring-white dark:bg-blue-500 dark:ring-[#060a10]" />
+                  <div className="mt-1 h-3.5 w-3.5 rounded-full bg-blue-600 ring-4 ring-white sm:h-4 sm:w-4 dark:bg-blue-500 dark:ring-[#060a10]" />
                 </div>
 
                 {/* CONTENT */}

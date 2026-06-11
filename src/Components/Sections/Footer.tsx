@@ -6,36 +6,13 @@ type FooterProps = {
 export default function Footer({ ref, visible }: FooterProps) {
   return (
     <footer
-      className={`fade-up ${visible ? "in" : ""}`}
-      style={{
-        borderTop: "0.5px solid #1e2a40",
-        padding: "1.5rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "8px",
-      }}
+      className={`fade-up flex flex-col gap-2 border-t border-slate-200 px-5 py-5 font-mono text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6 sm:text-xs dark:border-[#1e2a40] dark:text-[#2a3a56] ${
+        visible ? "in" : ""
+      }`}
       ref={ref}
     >
-      <span
-        style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: "12px",
-          color: "#2a3a56",
-        }}
-      >
-        OutOfSight — VLM Spatial Memory Benchmark
-      </span>
-      <span
-        style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: "12px",
-          color: "#2a3a56",
-        }}
-      >
-        ETH Zürich · 3D Vision · 2026
-      </span>
+      <span>OutOfSight — VLM Spatial Memory Benchmark</span>
+      <span>ETH Zürich · 3D Vision · 2026</span>
     </footer>
   );
 }

@@ -7,13 +7,13 @@ export default function View({ ref, visible }: ViewProps) {
   return (
     <section
       ref={ref}
-      className={`relative overflow-hidden px-8 py-24 text-center
+      className={`relative overflow-hidden px-5 py-16 text-center sm:px-8 sm:py-24
         bg-white text-slate-950
         dark:bg-[#070b14] dark:text-[#f0f2f8] ${visible ? "fade-up in" : ""}`}
     >
       <div
         className="
-          pointer-events-none absolute bottom-[-20%] left-1/2 h-100 w-175 -translate-x-1/2
+          pointer-events-none absolute bottom-[-20%] left-1/2 h-80 w-[130vw] -translate-x-1/2 sm:h-100 sm:w-175
           bg-[radial-gradient(ellipse,rgba(59,91,219,0.12)_0%,transparent_70%)]
           dark:bg-[radial-gradient(ellipse,rgba(59,91,219,0.16)_0%,transparent_70%)]
         "
@@ -38,11 +38,11 @@ export default function View({ ref, visible }: ViewProps) {
           evaluate directly against your model outputs.
         </p>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-4">
+        <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
           <a
             href="/questions"
             className="
-              group inline-flex items-center gap-2 rounded-xl
+              group inline-flex items-center justify-center gap-2 rounded-xl
               bg-linear-to-r from-blue-500 to-blue-600
               px-6 py-3 font-medium text-white
               shadow-lg shadow-blue-500/20
@@ -58,7 +58,7 @@ export default function View({ ref, visible }: ViewProps) {
           <a
             href="/results"
             className="
-              group inline-flex items-center gap-2 rounded-xl px-6 py-3 font-medium
+              group inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-medium
               text-slate-800
               bg-slate-100 border border-slate-200
               shadow-sm

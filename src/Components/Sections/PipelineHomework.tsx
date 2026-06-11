@@ -32,7 +32,7 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
       ref={ref}
       className={`
         fade-up ${visible ? "in" : ""}
-        px-8 py-20
+        px-5 py-14 sm:px-8 sm:py-20
         border-t border-b
         border-slate-200 dark:border-[#1e2a40]
         bg-white dark:bg-[#070b14]
@@ -59,8 +59,12 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
             <div
               key={step.n}
               className={`
-                relative p-8
-                ${i < steps.length - 1 ? "lg:border-r border-slate-200 dark:border-[#1e2a40]" : ""}
+                relative px-0 py-6 sm:p-8
+                ${i > 0 ? "border-t sm:border-t-0" : ""}
+                ${i % 2 === 1 ? "sm:border-l lg:border-l-0" : ""}
+                ${i >= 2 ? "sm:border-t lg:border-t-0" : ""}
+                ${i < steps.length - 1 ? "lg:border-r" : ""}
+                border-slate-200 dark:border-[#1e2a40]
               `}
             >
               <div
