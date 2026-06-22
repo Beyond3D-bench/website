@@ -44,12 +44,12 @@ export default function Header() {
             View Question
           </Link>
 
-          <Link
+          {/* <Link
             to="/results"
             className="text-gray-900 transition-colors duration-300 hover:text-blue-500 dark:text-gray-100 dark:hover:text-blue-400"
           >
             Results
-          </Link>
+          </Link> */}
 
           <Link
             to="/team"
@@ -102,13 +102,13 @@ export default function Header() {
               View Question
             </Link>
 
-            <Link
+            {/* <Link
               to="/results"
               onClick={closeMenu}
               className="rounded-lg px-3 py-2 text-gray-900 transition-colors duration-300 hover:bg-gray-100 hover:text-blue-500 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-blue-400"
             >
               Results
-            </Link>
+            </Link> */}
 
             <Link
               to="/team"
