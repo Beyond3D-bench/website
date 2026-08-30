@@ -24,21 +24,21 @@ type FloatingLabel = {
 
 const floatingLabels: FloatingLabel[] = [
   {
-    label: "Object permanence",
+    label: "Temporal grounding",
     top: "-6%",
     left: "-24%",
     delay: "0.8s",
     floatDuration: "14s",
   },
   {
-    label: "Spatial memory",
+    label: "Scene localization",
     bottom: "-2%",
     right: "-22%",
     delay: "1s",
     floatDuration: "18s",
   },
   {
-    label: "Hidden state",
+    label: "3D spatial perception",
     top: "50%",
     right: "-30%",
     delay: "1.2s",
@@ -98,9 +98,8 @@ export default function Hero({ ref, visible, stats }: HeroProps) {
           <h1
             className={`fade-up d2 ${visible ? "in" : ""} my-4 font-serif text-[clamp(42px,14vw,78px)] font-bold leading-[1.05] text-slate-950 sm:my-5 dark:text-[#f0f2f8]`}
           >
-            Out
-            <span className="italic text-blue-600 dark:text-blue-500">Of</span>
-            Sight
+            Beyond
+            <span className="italic text-blue-600 dark:text-blue-500">3D</span>
           </h1>
 
           <p
@@ -115,8 +114,10 @@ export default function Hero({ ref, visible, stats }: HeroProps) {
               visible ? "in" : ""
             } mb-8 max-w-125 text-sm leading-6 text-slate-600 sm:mb-10 sm:text-[15px] sm:leading-7 dark:text-[#5a6a88]`}
           >
-            OutOfSight benchmarks spatial memory, object permanence, and
-            hidden-state tracking in egocentric cooking video — built on{" "}
+            Beyond3D benchmarks out-of-sight spatiotemporal reasoning — tracking
+            an object as it is relocated, updating its spatial state, and
+            recalling that state once it leaves view — in egocentric cooking
+            video, built on{" "}
             <a
               href="https://hd-epic.github.io/site/"
               target="_blank"
@@ -218,7 +219,7 @@ export default function Hero({ ref, visible, stats }: HeroProps) {
             >
               <img
                 src={logo}
-                alt="OutOfSight logo"
+                alt="Beyond3D logo"
                 className="h-full w-full object-contain"
               />
             </div>

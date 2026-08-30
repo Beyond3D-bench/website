@@ -30,7 +30,7 @@ export default function Header() {
         <Link to="/" className="flex items-center" onClick={closeMenu}>
           <img
             src={!isDark ? logoLight : logoDark}
-            alt="OutOfSight logo"
+            alt="Beyond3D logo"
             className="h-10 w-auto"
           />
         </Link>

@@ -7,47 +7,60 @@ import { useDelayedInView } from "../Lib/DelayAnimation";
 
 const capabilities = [
   {
-    code: "Step 1",
-    title: "Current visibility check",
-    desc: "At the current time <TIME HH:MM:SS video X>, is the previously moved <Target Object> visible in the current frame?",
+    code: "Q1 — Visual grounding",
+    title: "Visibility check",
+    desc: "At <TIME HH:MM:SS.s video 1>, is the previously moved <Target Object> visible in the current frame?",
+    choices: "No; Yes",
   },
   {
-    code: "Step 2",
-    title: "Last visible observation",
-    desc: "The <Target Object> was moved earlier in the video. When was it last visible, and where was it located in the image at that moment?",
+    code: "Q2 — Temporal grounding",
+    title: "Last visible time",
+    desc: "Which timestamp is closest to when the <Target Object> was last visible?",
+    choices: "5 timestamps: HH:MM:SS — N seconds before the end",
   },
   {
-    code: "Step 3",
-    title: "Last placement observation",
-    desc: "The <Target Object> was moved earlier in the video. At what time did it stop moving? Where was it located in the image at that moment?",
+    code: "Q3 — Temporal grounding",
+    title: "Last placement time",
+    desc: "The <Target Object> was moved earlier in the video. Which timestamp is closest to when it last stopped being moved?",
+    choices: "5 timestamps: HH:MM:SS — N seconds before the end",
   },
   {
-    code: "Step 4",
-    title: "Scene anchor",
-    desc: "At the current time <TIME HH:MM:SS video X>, based on the last known position of the <Target Object> that was moved earlier, which counter area is closest to it?",
+    code: "Q4 — Scene localization",
+    title: "Nearest fixture",
+    desc: "At <TIME HH:MM:SS.s video 1>, based on the last known position of the <Target Object> that was moved earlier, which fixture type is closest to it? / which counter area is closest to it?",
+    choices: "5 fixture types / 3–6 kitchen-dependent counter areas",
   },
   {
-    code: "Step 5.a",
-    title: "Egocentric object-camera relation inference",
-    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, in which direction is the <Target Object> from your viewpoint?",
+    code: "Q5 — 3D spatial perception",
+    title: "Object–camera direction",
+    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, in which direction is the <Target Object> from your viewpoint?",
+    choices: "Front-right; Back-right; Front-left; Back-left",
   },
   {
-    code: "Step 5.b",
-    title: "Egocentric object-object relation",
-    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, and using the current position of the <Anchor Object> in the current frame, where is the <Target Object> relative to <Anchor Object> from your viewpoint?",
+    code: "Q6 — 3D spatial perception",
+    title: "Object–camera distance",
+    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, what is the distance between the camera and where the <Target Object> was left?",
+    choices: "Under 1 m; 1 to under 1.5 m; 1.5 m or more",
   },
   {
-    code: "Step 5.c",
-    title: "Object-object distance",
-    desc: "At the current time <TIME HH:MM:SS video X>, consider the <Target Object> that was moved earlier. Using its last known position to infer its current location, and using the current position of the <Anchor Object> in the current frame, how far is the <Target Object> from the <Anchor Object>: close, less than 1 meter; medium, at least 1 meter but less than 1.5 meters; or far, 1.5 meters or more?",
+    code: "Q7 — 3D spatial perception",
+    title: "Object–object direction",
+    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, where is it relative to the <Reference Object> (marked in red in the current frame) from your viewpoint?",
+    choices: "12 to 4:30 o'clock; 4:30 to 7:30 o'clock; 7:30 to 12 o'clock",
+  },
+  {
+    code: "Q8 — 3D spatial perception",
+    title: "Object–object distance",
+    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, how far is it relative to the <Reference Object> (marked in red in the current frame)?",
+    choices: "Under 1 m; 1 to under 1.5 m; 1.5 m or more",
   },
 ];
 
 const stats = [
-  { value: "HD-EPIC", label: "Dataset" },
-  { value: "7", label: "Question types" },
-  { value: "3D", label: "Spatial reasoning" },
-  { value: "VLM", label: "Evaluation target" },
+  { value: "9,000", label: "Questions" },
+  { value: "8", label: "Question types" },
+  { value: "1,000", label: "Out-of-sight anchors" },
+  { value: "135", label: "Egocentric videos" },
 ];
 
 export default function Homepage() {

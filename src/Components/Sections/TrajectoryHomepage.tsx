@@ -4,6 +4,7 @@ type Capability = {
   code: string;
   title: string;
   desc: string;
+  choices?: string;
 };
 
 type TrajectoryProps = {
@@ -29,15 +30,16 @@ export default function Trajectory({
       </div>
 
       <h2 className="mb-4 font-serif text-[clamp(28px,3vw,40px)] font-bold text-slate-950 dark:text-[#f0f2f8]">
-        Multi-step spatial reasoning questions
+        Eight diagnostic question types
       </h2>
 
       <p className="mb-10 max-w-4xl text-sm leading-6 text-slate-600 sm:mb-12 sm:text-center sm:text-[15px] sm:leading-7 dark:text-[#5a6a88]">
-        Models are asked with gradually increasing reasoning steps to track the
-        target object that was moved or viewed in the past, and infer its
-        spatial relation with the current scene. The questions are designed to
-        evaluate spatial memory, object permanence, and hidden-state tracking in
-        egocentric video.
+        Every query targets an object the camera wearer relocated and that has
+        since left the field of view. Eight multiple-choice questions probe
+        successive stages of the reasoning needed to recover its state: whether
+        the target is observable now, when it was last visible and last placed,
+        which fixture anchors that location, and where it lies relative to the
+        current viewpoint or to another object in the scene.
       </p>
 
       <div className="relative mx-auto mt-10 max-w-3xl sm:mt-14">
@@ -95,6 +97,12 @@ export default function Trajectory({
                   <p className="text-[13px] leading-6 text-slate-600 dark:text-[#5a6a88]">
                     {c.desc}
                   </p>
+
+                  {c.choices && (
+                    <p className="mt-2 font-mono text-[11px] leading-5 text-slate-500 dark:text-[#4d5a75]">
+                      Options: {c.choices}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             );

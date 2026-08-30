@@ -7,23 +7,23 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
   const steps = [
     {
       n: "1",
-      title: "Visibility tracking",
-      desc: "Per-frame object visibility is computed via 3D projection, geometric occlusion rays, fixture state machines, and Grounding DINO detection.",
+      title: "Visibility tracks",
+      desc: "Each object gets a 1 fps track built from HD-EPIC annotations and the kitchen digital twin: a nine-point footprint reprojected through the Aria fisheye model, occlusion rays cast against the scene mesh, then OWLv2 detection confirming what a frame really shows.",
     },
     {
       n: "2",
-      title: "Key-frame selection",
-      desc: "Anchor times T are chosen where an object is currently out of sight but was stably visible earlier — prioritising objects that have actually moved.",
+      title: "Query anchor selection",
+      desc: "An anchor is kept only where the target was relocated earlier and is stationary but out of view or occluded at query time. 1,000 anchors are balanced across query time and out-of-sight horizon, then manually verified.",
     },
     {
       n: "3",
       title: "Question generation",
-      desc: "Staged VQA is produced: first confirming invisibility, then asking about last placement, fixture, direction, and distance.",
+      desc: "Every anchor is expanded into eight templated multiple-choice questions with rule-based distractors, spanning visual grounding, temporal grounding, scene localization, and 3D spatial perception. 1,000 visible controls bring the set to 9,000.",
     },
     {
       n: "4",
       title: "VLM evaluation",
-      desc: "Models receive the full video clip and must answer without visual access to the queried object. Accuracy is tracked against horizon length.",
+      desc: "Models receive the 1 fps video prefix up to the query time and must answer without visual access to the target. Across nine VLMs the best reaches 42.2% macro accuracy against 29.7% chance.",
     },
   ];
 
