@@ -10,14 +10,12 @@ questions in eight types over 135 videos from nine participants, built on
 [HD-EPIC](https://hd-epic.github.io/site/) annotations.
 
 This repository holds the website, not the benchmark generation code. It
-serves four pages:
+serves two pages:
 
 | Route | Contents |
 | --- | --- |
-| `/` | Teaser figure, abstract, the eight question types, construction pipeline, BibTeX |
+| `/` | Authors, teaser figure, abstract, the eight question types, construction pipeline, results, failure modes, BibTeX |
 | `/questions` | Interactive question viewer — video, trajectory JSON, and a 3D kitchen scene per query anchor |
-| `/results` | Table 2 in full, failure-mode analysis, and the ablations |
-| `/team` | Author list and affiliations |
 
 ---
 
@@ -66,17 +64,18 @@ npm run lint
 │   └── models/                  # Kitchen scene .glb files
 ├── src/
 │   ├── Components/
-│   │   ├── Camera/              # Per-video tracking source data + loader
+│   │   ├── Camera/              # Per-video device calibration + tracking loader
 │   │   ├── Json/                # Benchmark question data (see below)
 │   │   ├── Layout/              # Header
 │   │   ├── Results/             # Results transcribed from the paper
 │   │   └── Sections/            # Page sections and charts
 │   ├── Lib/                     # Theme, animation and player helpers
-│   ├── pages/                   # Homepage, QuestionView, ResultsView, Team, NotFound
+│   ├── pages/                   # Homepage, QuestionView, NotFound
 │   ├── Layout.tsx               # Header + scroll container
 │   ├── App.tsx                  # Routes (code-split via React.lazy)
 │   └── index.css                # Tailwind entry, chart palette, reduced-motion
 ├── scripts/
+│   ├── build-question-data.mjs  # Generates the question data (see below)
 │   └── split-framewise-jsonl.mjs
 └── index.html                   # Head: meta tags, theme bootstrap
 ```
@@ -93,15 +92,13 @@ npm run build-questions
 ```
 
 That reads the VQA export and writes one `PXX-YYYYMMDD-HHMMSS.tsx` per video,
-exporting a `VIDEO: VideoEntry`. See `scripts/README.md` for what it selects and
-why. Everything it produces is committed, so a fresh clone runs the viewer with
-no external data.
+exporting a `VIDEO: VideoEntry`. Its output is committed, so a fresh clone runs
+the viewer with no external data. See `scripts/README.md` for what it selects.
 
 The result is auto-discovered — nothing to register. `src/Components/Json/Users.tsx`
 globs `./P*/**/*.tsx` eagerly and builds `USERS`, keeping participants P01
-through P10. A video needs a room model and camera tracks (below) as well as
-questions, so adding one means adding its two YouTube URLs to `VIDEO_META` in
-the script.
+through P10. A video also needs a room model and camera tracks (below), plus its
+two YouTube URLs in the script's `VIDEO_META`.
 
 **Camera trajectories.** Put `framewise_info.jsonl` and
 `device_calibration.json` under `src/Components/Camera/PXX/<video-id>/`, then:
@@ -115,11 +112,10 @@ splitting at 20 MiB to stay under Cloudflare's 25 MiB per-file limit. Re-run it
 whenever a `.jsonl` changes. Room models go in `public/models/` as
 `PXX_final.glb`.
 
-Only `device_calibration.json` is committed under `src/Components/Camera/` — it
-is imported directly. The `framewise_info.jsonl` files are not: they are input
-to the split script, and their chunked output in `public/Camera/` is what the
-app actually fetches, so keeping both was half a gigabyte of duplication. To
-re-split an existing video, copy its `.jsonl` back from
+Only `device_calibration.json` is committed there, since it is imported
+directly. The `.jsonl` files are not — the app fetches their chunked output from
+`public/Camera/`, so committing both duplicated half a gigabyte. To re-split an
+existing video, copy its `.jsonl` back from
 `hd-epic-annotations/Intermediate_data/PXX/<video-id>/` first.
 
 **Results.** Every number in the landing page's results section is transcribed

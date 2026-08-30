@@ -11,7 +11,7 @@ type CitationProps = {
  * preprint is out. Keep this string as the single source of truth — it is what
  * both the code block and the copy button use.
  */
-const BIBTEX = `@article{beyond3d,
+const BIBTEX = `@article{ma2026beyond3d,
   title   = {Long Time No See: Benchmarking VLMs for Out-of-Sight
              Spatiotemporal Reasoning in Egocentric Videos},
   author  = {Ma, Fangzhou and Ban, Ivo Alexander and Homburg, Eren and
