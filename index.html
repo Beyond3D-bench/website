@@ -2,6 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Stamp the theme before first paint, otherwise dark-mode visitors see a
+      white flash while the bundle loads. Mirrors src/Lib/Theme.tsx — keep the
+      two in sync.
+    -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var isDark =
+            saved === "dark" ||
+            (!saved &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", isDark);
+          document.documentElement.style.colorScheme = isDark
+            ? "dark"
+            : "light";
+        } catch (e) {
+          /* localStorage blocked — fall back to the light default */
+        }
+      })();
+    </script>
+
     <link
       rel="icon"
       href="/Logo-sm-light.png"
@@ -12,10 +37,49 @@
       href="/Logo-sm-dark.png"
       media="(prefers-color-scheme: dark)"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>
       Beyond3D — Benchmarking VLMs for Out-of-Sight Spatiotemporal Reasoning
     </title>
+    <meta
+      name="description"
+      content="A VQA benchmark for out-of-sight spatiotemporal reasoning in egocentric video — 9,000 questions testing whether vision-language models can recall where an object went after it leaves view."
+    />
+
+    <!--
+      TODO once the site has a domain: make og:url and og:image absolute
+      (e.g. https://your-domain/og-image.jpg). Slack resolves relative image
+      paths, but Facebook and LinkedIn require an absolute URL, so link
+      previews there will have no image until this is filled in.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Beyond3D" />
+    <meta
+      property="og:title"
+      content="Beyond3D — Benchmarking VLMs for Out-of-Sight Spatiotemporal Reasoning"
+    />
+    <meta
+      property="og:description"
+      content="A VQA benchmark for out-of-sight spatiotemporal reasoning in egocentric video — 9,000 questions testing whether vision-language models can recall where an object went after it leaves view."
+    />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="624" />
+    <meta
+      property="og:image:alt"
+      content="Overview of the Beyond3D benchmark: eight question types probing an object's state after it leaves the camera's field of view."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Beyond3D — Benchmarking VLMs for Out-of-Sight Spatiotemporal Reasoning"
+    />
+    <meta
+      name="twitter:description"
+      content="A VQA benchmark for out-of-sight spatiotemporal reasoning in egocentric video — 9,000 questions testing whether vision-language models can recall where an object went after it leaves view."
+    />
+    <meta name="twitter:image" content="/og-image.jpg" />
   </head>
   <body>
     <div id="root"></div>

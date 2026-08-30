@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Chart palette. Both modes validated for colour-vision deficiency against the
+   surfaces they actually render on (#ffffff light, #070b14 dark). */
+.viz {
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --viz-grid: #e1e0d9;
+  --viz-baseline: #c3c2b7;
+}
+
+.dark .viz {
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --viz-grid: #2c2c2a;
+  --viz-baseline: #383835;
+}
+
 @keyframes floatCircle {
   0% {
     transform: translate3d(0, 0, 0);
@@ -24,4 +40,26 @@
   animation-name: floatCircle;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
+}
+
+/* Respect the OS "reduce motion" setting. The .fade-up override matters as
+   well as the timings: those elements start at opacity 0 and are only revealed
+   by a transition, so without it the content would appear abruptly rather than
+   simply being present. Framer Motion animates inline styles from JS and is
+   handled separately, in the components that use it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

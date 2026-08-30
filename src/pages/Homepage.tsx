@@ -1,60 +1,18 @@
 import Hero from "../Components/Sections/HeroHomepage";
+import Teaser from "../Components/Sections/TeaserHomepage";
+import Abstract from "../Components/Sections/AbstractHomepage";
+import Problem from "../Components/Sections/ProblemHomepage";
+import Comparison from "../Components/Sections/ComparisonHomepage";
 import Trajectory from "../Components/Sections/TrajectoryHomepage";
 import Pipeline from "../Components/Sections/PipelineHomework";
-import View from "../Components/Sections/ViewHomepage";
+import Statistics from "../Components/Sections/StatisticsHomepage";
+import Results from "../Components/Sections/ResultsHomepage";
+import Qualitative from "../Components/Sections/QualitativeHomepage";
+import Takeaway from "../Components/Sections/TakeawayHomepage";
+import Citation from "../Components/Sections/CitationHomepage";
+import Acknowledgements from "../Components/Sections/AcknowledgementsHomepage";
 import Footer from "../Components/Sections/Footer";
 import { useDelayedInView } from "../Lib/DelayAnimation";
-
-const capabilities = [
-  {
-    code: "Q1 — Visual grounding",
-    title: "Visibility check",
-    desc: "At <TIME HH:MM:SS.s video 1>, is the previously moved <Target Object> visible in the current frame?",
-    choices: "No; Yes",
-  },
-  {
-    code: "Q2 — Temporal grounding",
-    title: "Last visible time",
-    desc: "Which timestamp is closest to when the <Target Object> was last visible?",
-    choices: "5 timestamps: HH:MM:SS — N seconds before the end",
-  },
-  {
-    code: "Q3 — Temporal grounding",
-    title: "Last placement time",
-    desc: "The <Target Object> was moved earlier in the video. Which timestamp is closest to when it last stopped being moved?",
-    choices: "5 timestamps: HH:MM:SS — N seconds before the end",
-  },
-  {
-    code: "Q4 — Scene localization",
-    title: "Nearest fixture",
-    desc: "At <TIME HH:MM:SS.s video 1>, based on the last known position of the <Target Object> that was moved earlier, which fixture type is closest to it? / which counter area is closest to it?",
-    choices: "5 fixture types / 3–6 kitchen-dependent counter areas",
-  },
-  {
-    code: "Q5 — 3D spatial perception",
-    title: "Object–camera direction",
-    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, in which direction is the <Target Object> from your viewpoint?",
-    choices: "Front-right; Back-right; Front-left; Back-left",
-  },
-  {
-    code: "Q6 — 3D spatial perception",
-    title: "Object–camera distance",
-    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, what is the distance between the camera and where the <Target Object> was left?",
-    choices: "Under 1 m; 1 to under 1.5 m; 1.5 m or more",
-  },
-  {
-    code: "Q7 — 3D spatial perception",
-    title: "Object–object direction",
-    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, where is it relative to the <Reference Object> (marked in red in the current frame) from your viewpoint?",
-    choices: "12 to 4:30 o'clock; 4:30 to 7:30 o'clock; 7:30 to 12 o'clock",
-  },
-  {
-    code: "Q8 — 3D spatial perception",
-    title: "Object–object distance",
-    desc: "At <TIME HH:MM:SS.s video 1>, assuming the previously moved <Target Object> remains at its last known position, how far is it relative to the <Reference Object> (marked in red in the current frame)?",
-    choices: "Under 1 m; 1 to under 1.5 m; 1.5 m or more",
-  },
-];
 
 const stats = [
   { value: "9,000", label: "Questions" },
@@ -67,8 +25,18 @@ export default function Homepage() {
   const { ref: heroRef, visible: heroVisible } = useDelayedInView(500);
   const { ref: trajectoryRef, visible: trajectoryVisible } =
     useDelayedInView(500);
+  const { ref: teaserRef, visible: teaserVisible } = useDelayedInView(300);
+  const { ref: abstractRef, visible: abstractVisible } = useDelayedInView(300);
+  const { ref: problemRef, visible: problemVisible } = useDelayedInView(300);
+  const { ref: comparisonRef, visible: comparisonVisible } =
+    useDelayedInView(300);
   const { ref: pipelineRef, visible: pipelineVisible } = useDelayedInView(500);
-  const { ref: viewRef, visible: viewVisible } = useDelayedInView(500);
+  const { ref: statsRef, visible: statsVisible } = useDelayedInView(300);
+  const { ref: resultsRef, visible: resultsVisible } = useDelayedInView(300);
+  const { ref: qualRef, visible: qualVisible } = useDelayedInView(300);
+  const { ref: takeawayRef, visible: takeawayVisible } = useDelayedInView(300);
+  const { ref: citationRef, visible: citationVisible } = useDelayedInView(300);
+  const { ref: ackRef, visible: ackVisible } = useDelayedInView(300);
   const { ref: footerRef, visible: footerVisible } = useDelayedInView(500);
 
   return (
@@ -99,16 +67,6 @@ export default function Homepage() {
         .d4 { transition-delay: 0.35s; }
         .d5 { transition-delay: 0.45s; }
         .d6 { transition-delay: 0.55s; }
-
-        .grid-bg {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(59,91,219,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59,91,219,0.06) 1px, transparent 1px);
-          background-size: 48px 48px;
-          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-        }
 
         .noise {
           position: absolute;
@@ -143,18 +101,41 @@ export default function Homepage() {
 
       <Hero ref={heroRef} visible={heroVisible} stats={stats} />
 
-      {/* ── WHAT WE TEST ─────────────────────────────────────── */}
-      <Trajectory
-        ref={trajectoryRef}
-        visible={trajectoryVisible}
-        capabilities={capabilities}
-      />
+      {/* ── TEASER FIGURE ────────────────────────────────────── */}
+      <Teaser ref={teaserRef} visible={teaserVisible} />
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
+      {/* ── ABSTRACT ─────────────────────────────────────────── */}
+      <Abstract ref={abstractRef} visible={abstractVisible} />
+
+      {/* ── WHY IT MATTERS ───────────────────────────────────── */}
+      <Problem ref={problemRef} visible={problemVisible} />
+
+      {/* ── WHY IT IS NEEDED ─────────────────────────────────── */}
+      <Comparison ref={comparisonRef} visible={comparisonVisible} />
+
+      {/* ── WHAT WE ASK ──────────────────────────────────────── */}
+      <Trajectory ref={trajectoryRef} visible={trajectoryVisible} />
+
+      {/* ── HOW IT IS BUILT ──────────────────────────────────── */}
       <Pipeline ref={pipelineRef} visible={pipelineVisible} />
 
-      {/* ── CTA ──────────────────────────────────────────────── */}
-      <View ref={viewRef} visible={viewVisible} />
+      {/* ── EVALUATION SET STATISTICS ────────────────────────── */}
+      <Statistics ref={statsRef} visible={statsVisible} />
+
+      {/* ── RESULTS ──────────────────────────────────────────── */}
+      <Results ref={resultsRef} visible={resultsVisible} />
+
+      {/* ── QUALITATIVE ──────────────────────────────────────── */}
+      <Qualitative ref={qualRef} visible={qualVisible} />
+
+      {/* ── TAKEAWAY ─────────────────────────────────────────── */}
+      <Takeaway ref={takeawayRef} visible={takeawayVisible} />
+
+      {/* ── CITATION ─────────────────────────────────────────── */}
+      <Citation ref={citationRef} visible={citationVisible} />
+
+      {/* ── ACKNOWLEDGEMENTS ─────────────────────────────────── */}
+      <Acknowledgements ref={ackRef} visible={ackVisible} />
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <Footer ref={footerRef} visible={footerVisible} />

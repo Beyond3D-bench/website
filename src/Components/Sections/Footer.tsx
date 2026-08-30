@@ -12,7 +12,7 @@ export default function Footer({ ref, visible }: FooterProps) {
       ref={ref}
     >
       <span>Beyond3D — VLM Out-of-Sight Spatiotemporal Reasoning Benchmark</span>
-      <span>ETH Zürich · 3D Vision · 2026</span>
+      <span>ETH Zürich · {new Date().getFullYear()}</span>
     </footer>
   );
 }

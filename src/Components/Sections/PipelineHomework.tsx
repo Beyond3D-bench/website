@@ -1,3 +1,5 @@
+import ThemedFigure from "./ThemedFigure";
+
 type PipelineProps = {
   ref?: React.Ref<HTMLElement>;
   visible: boolean;
@@ -33,15 +35,12 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
       className={`
         fade-up ${visible ? "in" : ""}
         px-5 py-14 sm:px-8 sm:py-20
-        border-t border-b
-        border-slate-200 dark:border-[#1e2a40]
-        bg-white dark:bg-[#070b14]
       `}
     >
       <div className="mx-auto max-w-275">
         <div className="mb-6">
           <span className="font-mono text-[11px] uppercase tracking-widest text-blue-600 dark:text-blue-400">
-            02 — Pipeline
+            Construction
           </span>
         </div>
 
@@ -54,19 +53,30 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
           From video to benchmark
         </h2>
 
-        <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <div
-              key={step.n}
-              className={`
-                relative px-0 py-6 sm:p-8
-                ${i > 0 ? "border-t sm:border-t-0" : ""}
-                ${i % 2 === 1 ? "sm:border-l lg:border-l-0" : ""}
-                ${i >= 2 ? "sm:border-t lg:border-t-0" : ""}
-                ${i < steps.length - 1 ? "lg:border-r" : ""}
-                border-slate-200 dark:border-[#1e2a40]
-              `}
-            >
+        <ThemedFigure
+          className="mb-12 sm:mb-14"
+          light="/pipeline.png"
+          dark="/pipeline-dark.svg"
+          alt="Benchmark construction. Stage one infers visibility tracks through a view check, an occlusion check against the scene mesh, and a detection check. Stage two turns valid out-of-sight anchors into 9,000 questions."
+          width={2000}
+          height={1624}
+          imageClassName="mx-auto max-w-3xl"
+        >
+          <figcaption className="mt-4 text-[13px] leading-6 text-slate-600 dark:text-[#5a6a88]">
+            <span className="font-medium text-slate-800 dark:text-[#c5d0e8]">
+              Figure 2.
+            </span>{" "}
+            The three-stage visibility check is what lets us assert a target is
+            genuinely invisible rather than probably invisible: an object must
+            fail the field-of-view test, or be blocked by the scene mesh, or go
+            unconfirmed by the detector. Only anchors labelled out of view or
+            occluded become questions.
+          </figcaption>
+        </ThemedFigure>
+
+        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step) => (
+            <div key={step.n}>
               <div
                 className="
                   mb-4 font-mono text-[32px] font-medium leading-none
@@ -86,6 +96,19 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
             </div>
           ))}
         </div>
+
+        <p className="mt-10 max-w-3xl text-sm leading-7 text-slate-600 sm:text-[15px] sm:leading-8 dark:text-[#5a6a88]">
+          The visibility tracks are what make the benchmark&apos;s central claim
+          checkable, so we audited them: an independent human pass over 4,176
+          object instances from 30 videos puts track accuracy at{" "}
+          <strong className="font-semibold text-slate-900 dark:text-[#c5d0e8]">
+            83.5%
+          </strong>
+          , with most errors on the conservative{" "}
+          <span className="font-mono text-[13px]">visually unconfirmed</span>{" "}
+          state — which is excluded from query anchors precisely because it is
+          the unreliable one.
+        </p>
       </div>
     </section>
   );
