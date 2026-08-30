@@ -85,12 +85,23 @@ npm run lint
 
 ## Adding benchmark content
 
-**Questions.** Data is auto-discovered — nothing to register by hand.
-`src/Components/Json/Users.tsx` globs `./P*/**/*.tsx` eagerly and builds
-`USERS`, keeping participants P01 through P10. To add a video, drop a
-`PXX-YYYYMMDD-HHMMSS.tsx` file into `src/Components/Json/PXX/` exporting a
-`VIDEO: VideoEntry`. Copy an existing file as a template and conform to the
-interfaces in `src/Components/Json/Types.tsx`.
+**Questions.** The files under `src/Components/Json/PXX/` are generated, not
+written by hand:
+
+```bash
+npm run build-questions
+```
+
+That reads the VQA export and writes one `PXX-YYYYMMDD-HHMMSS.tsx` per video,
+exporting a `VIDEO: VideoEntry`. See `scripts/README.md` for what it selects and
+why. Everything it produces is committed, so a fresh clone runs the viewer with
+no external data.
+
+The result is auto-discovered — nothing to register. `src/Components/Json/Users.tsx`
+globs `./P*/**/*.tsx` eagerly and builds `USERS`, keeping participants P01
+through P10. A video needs a room model and camera tracks (below) as well as
+questions, so adding one means adding its two YouTube URLs to `VIDEO_META` in
+the script.
 
 **Camera trajectories.** Put `framewise_info.jsonl` and
 `device_calibration.json` under `src/Components/Camera/PXX/<video-id>/`, then:
@@ -104,9 +115,16 @@ splitting at 20 MiB to stay under Cloudflare's 25 MiB per-file limit. Re-run it
 whenever a `.jsonl` changes. Room models go in `public/models/` as
 `PXX_final.glb`.
 
-**Results.** Every number on `/results` is transcribed from the paper into
-`src/Components/Results/Data.tsx`, with the source table or figure named in a
-comment.
+Only `device_calibration.json` is committed under `src/Components/Camera/` — it
+is imported directly. The `framewise_info.jsonl` files are not: they are input
+to the split script, and their chunked output in `public/Camera/` is what the
+app actually fetches, so keeping both was half a gigabyte of duplication. To
+re-split an existing video, copy its `.jsonl` back from
+`hd-epic-annotations/Intermediate_data/PXX/<video-id>/` first.
+
+**Results.** Every number in the landing page's results section is transcribed
+from the paper into `src/Components/Results/Data.tsx`, with the source table or
+figure named in a comment.
 
 ---
 

@@ -1,9 +1,15 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import type { AnswerMetadata, TrajectoryData, VideoEntry } from "../Json/Types";
+import type {
+  AnswerMetadata,
+  Step,
+  TrajectoryData,
+  VideoEntry,
+} from "../Json/Types";
 import type { TrackingEntry, FramewiseInfo, Matrix3x4 } from "../Camera/Types";
 import { OrbitControls, useGLTF, Line, Html } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ComponentRef } from "react";
 import { ChevronDown } from "lucide-react";
 
 type KitchenSceneProps = {
@@ -17,7 +23,16 @@ type KitchenSceneProps = {
   onSeek?: (timeSec: number) => void;
 };
 
-type SceneQuestionKey = "all" | "1" | "2" | "3" | "4" | "5a" | "5b" | "5c";
+type SceneQuestionKey =
+  | "all"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5a"
+  | "5b"
+  | "5c"
+  | "5d";
 
 type SceneQuestionOption = {
   key: SceneQuestionKey;
@@ -40,8 +55,9 @@ const QUESTION_OPTIONS: SceneQuestionOption[] = [
   { key: "3", stepLabel: "3", label: "Last Placement" },
   { key: "4", stepLabel: "4", label: "Nearest Fixture" },
   { key: "5a", stepLabel: "5a", label: "Camera Direction" },
-  { key: "5b", stepLabel: "5b", label: "Object Relation" },
-  { key: "5c", stepLabel: "5c", label: "Distance" },
+  { key: "5b", stepLabel: "5b", label: "Camera Distance" },
+  { key: "5c", stepLabel: "5c", label: "Object Relation" },
+  { key: "5d", stepLabel: "5d", label: "Object Distance" },
 ];
 
 function matrix3x4ToMatrix4(m: Matrix3x4): THREE.Matrix4 {
@@ -647,7 +663,7 @@ function HoverObjectHighlighter({
   return <HoveredObjectEdges object={hoveredObject} />;
 }
 
-function transformFixture(fixture: any): string {
+function transformFixture(fixture: string): string {
   return fixture.replace(/^.*?_/, "").replace(".", "");
 }
 
@@ -939,27 +955,24 @@ function SceneContent({
   ): WorldPoint | null {
     if (!meta) return null;
 
-    const anyMeta = meta as any;
-
     const worldCoordinates =
       prefix != null
-        ? anyMeta[`${prefix}_world_coordinates`]
-        : anyMeta.world_coordinates;
+        ? meta[`${prefix}_world_coordinates`]
+        : meta.world_coordinates;
 
     return makeWorldPoint(worldCoordinates);
   }
 
-  function getIncrementalSteps(): any[] {
+  function getIncrementalSteps(): Step[] {
     if (!trajectory) return [];
 
-    const anyTrajectory = trajectory as any;
-
-    if (Array.isArray(anyTrajectory.incremental_steps)) {
-      return anyTrajectory.incremental_steps;
+    if (Array.isArray(trajectory.incremental_steps)) {
+      return trajectory.incremental_steps;
     }
 
-    if (Array.isArray(anyTrajectory.steps)) {
-      return anyTrajectory.steps;
+    // Older exports put the steps in a flat `steps` array.
+    if (Array.isArray(trajectory.steps)) {
+      return trajectory.steps as Step[];
     }
 
     return [];
@@ -992,8 +1005,7 @@ function SceneContent({
   function getBranchStep(stepKey: SceneQuestionKey) {
     if (!trajectory) return null;
 
-    const branchGroups = trajectory.branch_groups as Record<string, any[]>;
-    const postStep4 = branchGroups?.["post_step4"];
+    const postStep4 = trajectory.branch_groups?.["post_step4"];
 
     if (!Array.isArray(postStep4) || postStep4.length === 0) {
       return null;
@@ -1028,7 +1040,9 @@ function SceneContent({
       return selectedAnchorPoint;
     }
 
-    const objectRelationStep = getBranchStep("5b");
+    // 5c is the object-relation question — the only branch step besides 5d
+    // that carries a reference object (object_y).
+    const objectRelationStep = getBranchStep("5c");
     const objectRelationAnchorPoint = makeWorldPointFromMeta(
       objectRelationStep?.answer_metadata as AnswerMetadata | undefined,
       "object_y",
@@ -1044,7 +1058,7 @@ function SceneContent({
   function getSelectedTargetWorldPoint(): WorldPoint | null {
     if (selectedQuestionKey === "all") {
       return (
-        getBranchTargetWorldPoint("5b") ??
+        getBranchTargetWorldPoint("5c") ??
         getIncrementalStepWorldPoint(3) ??
         getIncrementalStepWorldPoint(2)
       );
@@ -1062,7 +1076,11 @@ function SceneContent({
         getIncrementalStepWorldPoint(2)
       );
     }
-    if (selectedQuestionKey === "5b" || selectedQuestionKey === "5c") {
+    if (
+      selectedQuestionKey === "5b" ||
+      selectedQuestionKey === "5c" ||
+      selectedQuestionKey === "5d"
+    ) {
       return (
         getBranchTargetWorldPoint(selectedQuestionKey) ??
         getIncrementalStepWorldPoint(3) ??
@@ -1081,13 +1099,15 @@ function SceneContent({
     selectedQuestionKey === "4" ||
     selectedQuestionKey === "5a" ||
     selectedQuestionKey === "5b" ||
-    selectedQuestionKey === "5c";
+    selectedQuestionKey === "5c" ||
+    selectedQuestionKey === "5d";
   const showFixture =
     selectedQuestionKey === "all" || selectedQuestionKey === "4";
+  // Only the object-to-object questions have a reference object to anchor to.
   const showAnchor =
     selectedQuestionKey === "all" ||
-    selectedQuestionKey === "5b" ||
-    selectedQuestionKey === "5c";
+    selectedQuestionKey === "5c" ||
+    selectedQuestionKey === "5d";
 
   const targetObject = getSelectedTargetWorldPoint();
 
@@ -1200,7 +1220,7 @@ function TrackingOrbitControls({
   target: THREE.Vector3;
   trackingEnabled: boolean;
 }) {
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<ComponentRef<typeof OrbitControls> | null>(null);
   const previousTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const [controlsKey, setControlsKey] = useState(0);
 

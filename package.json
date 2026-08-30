@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build-questions": "node scripts/build-question-data.mjs",
     "split-framewise": "node scripts/split-framewise-jsonl.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
