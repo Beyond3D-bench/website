@@ -44,8 +44,8 @@ export default function Qualitative({ ref, visible }: QualitativeProps) {
       </p>
 
       <ThemedFigure
-        light="/qualitative.jpg"
-        dark="/qualitative-dark.jpg"
+        light={`${import.meta.env.BASE_URL}qualitative.jpg`}
+        dark={`${import.meta.env.BASE_URL}qualitative-dark.jpg`}
         alt="Two qualitative examples with reasoning traces. In the first, the model misses the blueberry box's final relocation and misidentifies it. In the second, it tracks the food processor lid correctly but fails the camera-relative 3D reasoning."
         width={2200}
         height={1407}

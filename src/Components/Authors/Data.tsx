@@ -32,29 +32,32 @@ export const AFFILIATIONS = [
 export type Institution = {
   name: string;
   src: string;
+  darkSrc?: string;
   height: string;
   heightCompact: string;
-  invertInDark: boolean;
+  invertInDark?: boolean;
+  scale?: string;
 };
 
 export const INSTITUTIONS: Institution[] = [
   {
     name: "ETH Zürich",
-    src: "/logos/eth-zurich.svg",
-    height: "h-8 sm:h-10",
-    heightCompact: "h-6 sm:h-8",
-    invertInDark: true,
+    src: `${import.meta.env.BASE_URL}logos/eth-logo-pos.png`,
+    darkSrc: `${import.meta.env.BASE_URL}logos/eth-logo-neg.png`,
+    height: "h-15 sm:h-10",
+    heightCompact: "h-19 sm:h-8",
+    scale: "scale-[2]",
   },
   {
     name: "Microsoft Spatial AI Lab",
-    src: "/logos/microsoft.svg",
+    src: `${import.meta.env.BASE_URL}logos/microsoft.svg`,
     height: "h-7 sm:h-8",
     heightCompact: "h-5 sm:h-6",
     invertInDark: false,
   },
   {
     name: "Bocconi University",
-    src: "/logos/bocconi.svg",
+    src: `${import.meta.env.BASE_URL}logos/bocconi.svg`,
     height: "h-7 sm:h-9",
     heightCompact: "h-5 sm:h-7",
     invertInDark: true,

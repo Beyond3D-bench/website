@@ -55,8 +55,8 @@ export default function Pipeline({ ref, visible }: PipelineProps) {
 
         <ThemedFigure
           className="mb-12 sm:mb-14"
-          light="/pipeline.png"
-          dark="/pipeline-dark.svg"
+          light={`${import.meta.env.BASE_URL}pipeline.png`}
+          dark={`${import.meta.env.BASE_URL}pipeline-dark.svg`}
           alt="Benchmark construction. Stage one infers visibility tracks through a view check, an occlusion check against the scene mesh, and a detection check. Stage two turns valid out-of-sight anchors into 9,000 questions."
           width={2000}
           height={1624}

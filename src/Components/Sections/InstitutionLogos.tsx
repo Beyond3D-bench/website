@@ -22,17 +22,37 @@ function InstitutionLogo({ institution, compact }: LogoProps) {
     );
   }
 
+  const imageClass = `${
+    compact ? institution.heightCompact : institution.height
+  } w-auto opacity-75 transition-opacity group-hover:opacity-100 ${
+    institution.scale ?? ""
+  }`;
+
+  const darkFallbackClass =
+    !institution.darkSrc && institution.invertInDark
+      ? "dark:brightness-0 dark:invert"
+      : "";
+
   return (
-    <img
-      src={institution.src}
-      alt={institution.name}
-      onError={() => setMissing(true)}
-      className={`${
-        compact ? institution.heightCompact : institution.height
-      } w-auto opacity-75 transition-opacity group-hover:opacity-100 dark:opacity-90 ${
-        institution.invertInDark ? "dark:brightness-0 dark:invert" : ""
-      }`}
-    />
+    <>
+      <img
+        src={institution.src}
+        alt={institution.name}
+        onError={() => setMissing(true)}
+        className={`${imageClass} ${
+          institution.darkSrc ? "dark:hidden" : darkFallbackClass
+        }`}
+      />
+
+      {institution.darkSrc && (
+        <img
+          src={institution.darkSrc}
+          alt={institution.name}
+          onError={() => setMissing(true)}
+          className={`${imageClass} hidden dark:block`}
+        />
+      )}
+    </>
   );
 }
 
@@ -55,7 +75,9 @@ export default function InstitutionLogos({
   return (
     <div
       className={`flex flex-wrap items-end justify-center ${
-        compact ? "gap-x-10 gap-y-7 sm:gap-x-14" : "gap-x-14 gap-y-8 sm:gap-x-18"
+        compact
+          ? "gap-x-10 gap-y-7 sm:gap-x-14"
+          : "gap-x-14 gap-y-8 sm:gap-x-18"
       }`}
     >
       {INSTITUTIONS.map((institution, i) => (

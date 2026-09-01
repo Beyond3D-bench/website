@@ -17,9 +17,9 @@ export default function Teaser({ ref, visible }: TeaserProps) {
       className={`fade-up ${visible ? "in" : ""} mx-auto max-w-275 px-5 pb-14 sm:px-8 sm:pb-20`}
     >
       <ThemedFigure
-        light="/teaser.jpg"
-        dark="/teaser-dark.jpg"
-        alt="Overview of the Beyond3D benchmark: as a box of eggs is moved by the camera wearer and leaves the field of view, eight questions probe visual grounding, temporal grounding, scene localization and 3D spatial perception."
+        light={`${import.meta.env.BASE_URL}teaser.jpg`}
+        dark={`${import.meta.env.BASE_URL}teaser-dark.jpg`}
+        alt="Overview of the Beyond3D benchmark..."
         width={2200}
         height={1145}
       >
