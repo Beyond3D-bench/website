@@ -9,13 +9,13 @@ been relocated and has since left the field of view. It comprises 9,000
 questions in eight types over 135 videos from nine participants, built on
 [HD-EPIC](https://hd-epic.github.io/site/) annotations.
 
-This repository holds the website, not the benchmark generation code. It
+This repository holds the [website](https://beyond3d-bench.github.io/website/), not the benchmark generation code. It
 serves two pages:
 
-| Route        | Contents                                                                                                          |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `/`          | Authors, teaser figure, abstract, the eight question types, construction pipeline, results, failure modes, BibTeX |
-| `/questions` | Interactive question viewer — video, trajectory JSON, and a 3D kitchen scene per query anchor                     |
+| Route                | Contents                                                                                                          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `/website/`          | Authors, teaser figure, abstract, the eight question types, construction pipeline, results, failure modes, BibTeX |
+| `/website/questions` | Interactive question viewer — video, trajectory JSON, and a 3D kitchen scene per query anchor                     |
 
 ---
 
