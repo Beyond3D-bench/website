@@ -3,8 +3,8 @@
 Project page for **Long Time No See: Benchmarking VLMs for Out-of-Sight
 Spatiotemporal Reasoning in Egocentric Videos**.
 
-Beyond3D is a VQA benchmark that isolates *out-of-sight spatiotemporal
-reasoning* in dynamic egocentric video: every query targets an object that has
+Beyond3D is a VQA benchmark that isolates _out-of-sight spatiotemporal
+reasoning_ in dynamic egocentric video: every query targets an object that has
 been relocated and has since left the field of view. It comprises 9,000
 questions in eight types over 135 videos from nine participants, built on
 [HD-EPIC](https://hd-epic.github.io/site/) annotations.
@@ -12,10 +12,10 @@ questions in eight types over 135 videos from nine participants, built on
 This repository holds the website, not the benchmark generation code. It
 serves two pages:
 
-| Route | Contents |
-| --- | --- |
-| `/` | Authors, teaser figure, abstract, the eight question types, construction pipeline, results, failure modes, BibTeX |
-| `/questions` | Interactive question viewer — video, trajectory JSON, and a 3D kitchen scene per query anchor |
+| Route        | Contents                                                                                                          |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `/`          | Authors, teaser figure, abstract, the eight question types, construction pipeline, results, failure modes, BibTeX |
+| `/questions` | Interactive question viewer — video, trajectory JSON, and a 3D kitchen scene per query anchor                     |
 
 ---
 
@@ -152,23 +152,6 @@ tags, using `public/Logo-sm-light.png` and `public/Logo-sm-dark.png`.
 
 React · Vite · Tailwind CSS · React Router · three.js / react-three-fiber ·
 Framer Motion
-
----
-
-## License (GNU GPL v3)
-
-This project is licensed under the GNU General Public License v3.0.
-
-You are free to use, modify and distribute it, under the following conditions:
-
-- You must disclose source code
-- You must use the same license (GPL v3)
-- You must include the original license and copyright
-
-Full license text: https://www.gnu.org/licenses/gpl-3.0.en.html
-
-Note that this license covers the website code. Terms for the benchmark data
-itself are yet to be determined.
 
 ---
 
