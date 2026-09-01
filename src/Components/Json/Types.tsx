@@ -10,8 +10,17 @@ export interface AnswerMetadata {
   distance_bucket?: string;
   distance_m?: number;
   world_coordinates?: [number, number, number];
+  camera_coordinates?: [number, number, number];
   object_y_projected_pixel?: [number, number];
+  object_y_pixel?: [number, number];
+  object_y_normalized_projected_pixel?: [number, number];
+  object_y_world_coordinates?: [number, number, number];
+  object_x_world_coordinates?: [number, number, number];
   object_y_name?: string;
+  raw_correct_fixture?: string;
+  reference_time_sec?: number;
+  status?: string;
+  is_visible?: boolean;
   [key: string]: unknown;
 }
 
@@ -23,12 +32,14 @@ export interface Step {
   correct_idx?: number | null;
   acceptable_idxs?: number[];
   acceptable_answers?: string[];
+  /** Gold answer text, carried by the current export alongside correct_idx. */
+  target_text?: string;
   answer_metadata: AnswerMetadata;
   skipped?: boolean;
 }
 
 export interface BranchStep extends Step {
-  depends_on_steps: number[];
+  depends_on_steps: Array<number | string>;
   branch_group: string;
 }
 

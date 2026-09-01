@@ -910,7 +910,6 @@ export default function QuestionView() {
             {activePanel === "questions" ? (
               <QuestionPanel
                 trajectory={selectedTrajectory}
-                currentTimeSec={currentTimeSec}
                 onSeek={setCurrentTimeSec}
               />
             ) : (
@@ -995,8 +994,9 @@ export default function QuestionView() {
       >
         <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 md:w-4" />
       </div>
-      {/* MIDDLE: video always visible */}
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
+      {/* MIDDLE: video always visible. A section, not a <main> — Layout already
+          renders the page's main landmark and nesting two confuses screen readers. */}
+      <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-black">
         {selectedVideo ? (
           <VideoPlayer
             key={selectedVideo.id}
@@ -1010,7 +1010,7 @@ export default function QuestionView() {
             No video selected
           </div>
         )}
-      </main>
+      </section>
       <div
         role="separator"
         aria-orientation="vertical"
@@ -1072,7 +1072,6 @@ export default function QuestionView() {
             <div className="h-full overflow-y-auto">
               <QuestionPanel
                 trajectory={selectedTrajectory}
-                currentTimeSec={currentTimeSec}
                 onSeek={setCurrentTimeSec}
               />
             </div>

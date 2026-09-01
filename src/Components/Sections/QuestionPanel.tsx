@@ -3,7 +3,6 @@ import type { TrajectoryData, Step, BranchStep } from "../Json/Types";
 
 interface QuestionPanelProps {
   trajectory: TrajectoryData | null | undefined;
-  currentTimeSec: number;
   onSeek: (t: number) => void;
 }
 
@@ -52,6 +51,13 @@ const CLASS_CONFIG: Record<
     text: "text-red-700 dark:text-red-400",
     border: "border-red-200 dark:border-red-500/20",
   },
+  oos_branch_object_camera_distance: {
+    label: "Camera Distance",
+    color: "#818cf8",
+    bg: "bg-indigo-50 dark:bg-indigo-500/10",
+    text: "text-indigo-700 dark:text-indigo-400",
+    border: "border-indigo-200 dark:border-indigo-500/20",
+  },
   oos_branch_object_object_relation: {
     label: "Object Relation",
     color: "#f472b6",
@@ -60,7 +66,7 @@ const CLASS_CONFIG: Record<
     border: "border-pink-200 dark:border-pink-500/20",
   },
   oos_branch_object_object_distance: {
-    label: "Distance",
+    label: "Object Distance",
     color: "#2dd4bf",
     bg: "bg-teal-50 dark:bg-teal-500/10",
     text: "text-teal-700 dark:text-teal-400",
@@ -230,10 +236,11 @@ function QuestionCard({
     answerSummaryLines.push(`Pixel (norm): ${normalizedPixel}`);
   }
 
-  const shouldShowAnswerSummary =
-    showAnswer &&
-    answerSummaryLines.length > 0 &&
-    (step.choices.length === 0 || step.correct_idx == null);
+  // Every step is a proper multiple choice now, so the old guard — show the
+  // metadata only where there were no choices to tick — hid these lines
+  // everywhere. They still add what the choice text cannot: the fixture name,
+  // the metric distance, the pixel the answer was projected from.
+  const shouldShowAnswerSummary = showAnswer && answerSummaryLines.length > 0;
 
   return (
     <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm shadow-slate-900/3 dark:border-white/[0.07] dark:bg-slate-900/60 dark:shadow-none">
@@ -336,11 +343,7 @@ function QuestionCard({
   );
 }
 
-export function QuestionPanel({
-  trajectory,
-  currentTimeSec: _currentTimeSec,
-  onSeek,
-}: QuestionPanelProps) {
+export function QuestionPanel({ trajectory, onSeek }: QuestionPanelProps) {
   if (!trajectory) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-600">

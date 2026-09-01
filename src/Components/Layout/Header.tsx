@@ -30,32 +30,25 @@ export default function Header() {
         <Link to="/" className="flex items-center" onClick={closeMenu}>
           <img
             src={!isDark ? logoLight : logoDark}
-            alt="OutOfSight logo"
+            alt="Beyond3D logo"
             className="h-10 w-auto"
           />
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden w-full justify-around text-lg font-semibold md:flex">
+        {/* Desktop nav — centred as a group, not spread across the bar */}
+        <div className="hidden w-full items-center justify-center gap-10 text-lg font-semibold md:flex">
+          <Link
+            to="/"
+            className="text-gray-900 transition-colors duration-300 hover:text-blue-500 dark:text-gray-100 dark:hover:text-blue-400"
+          >
+            Overview
+          </Link>
+
           <Link
             to="/questions"
             className="text-gray-900 transition-colors duration-300 hover:text-blue-500 dark:text-gray-100 dark:hover:text-blue-400"
           >
-            View Question
-          </Link>
-
-          {/* <Link
-            to="/results"
-            className="text-gray-900 transition-colors duration-300 hover:text-blue-500 dark:text-gray-100 dark:hover:text-blue-400"
-          >
-            Results
-          </Link> */}
-
-          <Link
-            to="/team"
-            className="text-gray-900 transition-colors duration-300 hover:text-blue-500 dark:text-gray-100 dark:hover:text-blue-400"
-          >
-            Team
+            View Questions
           </Link>
         </div>
 
@@ -99,23 +92,15 @@ export default function Header() {
               onClick={closeMenu}
               className="rounded-lg px-3 py-2 text-gray-900 transition-colors duration-300 hover:bg-gray-100 hover:text-blue-500 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-blue-400"
             >
-              View Question
+              View Questions
             </Link>
 
-            {/* <Link
+            <Link
               to="/results"
               onClick={closeMenu}
               className="rounded-lg px-3 py-2 text-gray-900 transition-colors duration-300 hover:bg-gray-100 hover:text-blue-500 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-blue-400"
             >
               Results
-            </Link> */}
-
-            <Link
-              to="/team"
-              onClick={closeMenu}
-              className="rounded-lg px-3 py-2 text-gray-900 transition-colors duration-300 hover:bg-gray-100 hover:text-blue-500 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-blue-400"
-            >
-              Team
             </Link>
           </div>
         </div>
