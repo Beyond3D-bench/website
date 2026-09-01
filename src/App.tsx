@@ -22,7 +22,7 @@ function RouteFallback() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/website/">
       <Layout>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
