@@ -73,7 +73,7 @@ async function loadFramewiseInfo(
   userId: string,
   videoId: string,
 ): Promise<FramewiseInfo[]> {
-  const baseUrl = `/Camera/${userId}/${videoId}/framewise_info`;
+  const baseUrl = `${import.meta.env.BASE_URL}Camera/${userId}/${videoId}/framewise_info`;
   const manifestUrl = `${baseUrl}/manifest.json`;
 
   const manifest = await fetchJson<FramewiseManifest>(manifestUrl);

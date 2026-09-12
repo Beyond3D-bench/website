@@ -123,7 +123,7 @@ function KitchenModel({
   modelRef: React.RefObject<THREE.Object3D | null>;
 }) {
   const userPrefix = videoId?.slice(0, 3) ?? "P01";
-  const modelUrl = `/models/${userPrefix}_final.glb`;
+  const modelUrl = `${import.meta.env.BASE_URL}models/${userPrefix}_final.glb`;
 
   const gltf = useGLTF(modelUrl);
 
