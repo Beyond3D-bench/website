@@ -123,8 +123,8 @@ export function HorizonCurves() {
   const [best, ...rest] = HORIZON_CURVES;
 
   // Plot geometry, in viewBox units.
-  const w = 420;
-  const h = 240;
+  const w = 180;
+  const h = 100;
   const pad = { top: 16, right: 16, bottom: 34, left: 38 };
   const yMin = 20;
   const yMax = 50;
@@ -149,7 +149,7 @@ export function HorizonCurves() {
         over models, 40.4% at short horizons down to 31.9% at long ones.
       </p>
 
-      <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-600 dark:text-[#8899b8]">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-600 dark:text-[#8899b8]">
         <span className="inline-flex items-center gap-2">
           <Swatch color="var(--series-1)" />
           {best.model} (best)
@@ -178,14 +178,14 @@ export function HorizonCurves() {
               y1={y(tick)}
               y2={y(tick)}
               stroke="var(--viz-grid)"
-              strokeWidth={0.75}
+              strokeWidth={0.2}
             />
             <text
-              x={pad.left - 7}
-              y={y(tick) + 3.5}
+              x={pad.left - 4}
+              y={y(tick) + 1.5}
               textAnchor="end"
               className="fill-slate-400 dark:fill-[#3a4560]"
-              fontSize={9}
+              fontSize={4}
               fontFamily="ui-monospace, monospace"
             >
               {tick}
@@ -199,7 +199,7 @@ export function HorizonCurves() {
           y1={y(HORIZON_RANDOM)}
           y2={y(HORIZON_RANDOM)}
           stroke="var(--viz-baseline)"
-          strokeWidth={1}
+          strokeWidth={0.5}
           strokeDasharray="4 3"
         />
 
@@ -208,7 +208,7 @@ export function HorizonCurves() {
             key={curve.model}
             d={path(curve.values)}
             fill="none"
-            strokeWidth={1.5}
+            strokeWidth={0.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             className="stroke-slate-300 dark:stroke-[#2a3a56]"
@@ -223,7 +223,7 @@ export function HorizonCurves() {
           d={path(best.values)}
           fill="none"
           stroke="var(--series-1)"
-          strokeWidth={2}
+          strokeWidth={1}
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -237,7 +237,7 @@ export function HorizonCurves() {
             key={HORIZON_LABELS[i]}
             cx={x(i)}
             cy={y(v)}
-            r={3.5}
+            r={1.5}
             fill="var(--series-1)"
           />
         ))}
@@ -246,17 +246,17 @@ export function HorizonCurves() {
           <text
             key={label}
             x={x(i)}
-            y={h - 12}
+            y={h - 24}
             textAnchor={i === 0 ? "start" : i === 2 ? "end" : "middle"}
             className="fill-slate-500 dark:fill-[#4a5870]"
-            fontSize={10}
+            fontSize={4}
           >
             {label}
           </text>
         ))}
       </svg>
 
-      <div className="mt-2 font-mono text-[10px] text-slate-400 dark:text-[#3a4560]">
+      <div className="mt-[-85px] font-mono text-[9px] text-slate-400 dark:text-[#3a4560]">
         Out-of-sight horizon · macro accuracy %
       </div>
     </figure>
@@ -409,10 +409,7 @@ export function TemporalChart() {
       </p>
 
       <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
-        <BucketPanel
-          title="Out-of-sight horizon"
-          buckets={HORIZON_BUCKETS}
-        />
+        <BucketPanel title="Out-of-sight horizon" buckets={HORIZON_BUCKETS} />
         <BucketPanel title="Query time" buckets={QUERY_TIME_BUCKETS} />
       </div>
     </figure>
