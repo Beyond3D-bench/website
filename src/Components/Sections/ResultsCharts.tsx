@@ -182,10 +182,10 @@ export function HorizonCurves() {
             />
             <text
               x={pad.left - 4}
-              y={y(tick) + 1.5}
+              y={y(tick) + 0.75}
               textAnchor="end"
               className="fill-slate-400 dark:fill-[#3a4560]"
-              fontSize={4}
+              fontSize={2.5}
               fontFamily="ui-monospace, monospace"
             >
               {tick}
@@ -246,10 +246,10 @@ export function HorizonCurves() {
           <text
             key={label}
             x={x(i)}
-            y={h - 24}
+            y={h - 26}
             textAnchor={i === 0 ? "start" : i === 2 ? "end" : "middle"}
             className="fill-slate-500 dark:fill-[#4a5870]"
-            fontSize={4}
+            fontSize={2.5}
           >
             {label}
           </text>
