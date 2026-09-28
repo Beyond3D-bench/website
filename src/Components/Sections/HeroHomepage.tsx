@@ -16,11 +16,19 @@ type HeroProps = {
   stats: Stat[];
 };
 
-/** No URLs yet — these render as pending until the links exist. */
+/** Resources without a URL render as pending. */
 const resources = [
   { label: "Paper", Icon: FileText, href: null },
-  { label: "Code", Icon: Code2, href: null },
-  { label: "Data", Icon: Database, href: null },
+  {
+    label: "Code",
+    Icon: Code2,
+    href: "https://github.com/Beyond3D-bench/vlm-evaluation",
+  },
+  {
+    label: "Data",
+    Icon: Database,
+    href: "https://huggingface.co/datasets/Ffffangzhu/BEYOND3D",
+  },
 ];
 
 /**
