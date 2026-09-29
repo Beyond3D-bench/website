@@ -6,19 +6,15 @@ type CitationProps = {
   visible: boolean;
 };
 
-/**
- * Title and author list are final; venue and year are placeholders until the
- * preprint is out. Keep this string as the single source of truth — it is what
- * both the code block and the copy button use.
- */
-const BIBTEX = `@article{ma2026beyond3d,
-  title   = {Long Time No See: Benchmarking VLMs for Out-of-Sight
-             Spatiotemporal Reasoning in Egocentric Videos},
-  author  = {Ma, Fangzhou and Ban, Ivo Alexander and Homburg, Eren and
-             Goletto, Gabriele and Pautrat, R\\'emi and Rad, Mahdi and
-             Plizzari, Chiara and Pollefeys, Marc},
-  journal = {TBD},
-  year    = {TBD},
+/** This string is the single source of truth for the block and copy button. */
+const BIBTEX = `@misc{ma2026beyond3d,
+  title         = {Long Time No See: Benchmarking VLMs for Out-of-Sight Spatiotemporal Reasoning in Egocentric Videos},
+  author        = {Fangzhou Ma and Ivo Alexander Ban and Eren Homburg and Gabriele Goletto and Rémi Pautrat and Mahdi Rad and Chiara Plizzari and Marc Pollefeys},
+  year          = {2026},
+  eprint        = {2609.34630},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2609.34630}
 }`;
 
 export default function Citation({ ref, visible }: CitationProps) {
@@ -52,7 +48,7 @@ export default function Citation({ ref, visible }: CitationProps) {
       </h2>
 
       <p className="mb-8 max-w-3xl text-sm leading-6 text-slate-600 sm:text-[15px] sm:leading-7 dark:text-[#5a6a88]">
-        Venue and year are placeholders until the preprint is public.
+        If you use Beyond3D in your work, please cite our arXiv preprint.
       </p>
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-[#1e2a40] dark:bg-white/3">

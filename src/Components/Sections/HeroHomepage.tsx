@@ -18,7 +18,11 @@ type HeroProps = {
 
 /** Resources without a URL render as pending. */
 const resources = [
-  { label: "Paper", Icon: FileText, href: null },
+  {
+    label: "Paper",
+    Icon: FileText,
+    href: "https://arxiv.org/abs/2609.34630",
+  },
   {
     label: "Code",
     Icon: Code2,
